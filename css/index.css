@@ -17,6 +17,19 @@
     --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+[data-theme="dark"] {
+    --primary-color: #3b82f6;
+    --secondary-color: #94a3b8;
+    --accent-color: #fbbf24;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --border-color: #334155;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -26,6 +39,7 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     background-color: var(--bg-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Header */
@@ -33,7 +47,7 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
@@ -59,6 +73,7 @@ nav {
     display: flex;
     list-style: none;
     gap: 2rem;
+    align-items: center;
 }
 
 .nav-links a {
@@ -86,6 +101,35 @@ nav {
 
 .nav-links a:hover::after {
     width: 100%;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    background: none;
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.theme-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover i {
+    transform: rotate(15deg);
 }
 
 .mobile-menu-toggle {
@@ -184,7 +228,7 @@ nav {
     height: 350px;
     border-radius: 50%;
     object-fit: cover;
-    border: 8px solid white;
+    border: 8px solid var(--bg-primary);
     box-shadow: var(--shadow-lg);
     transition: transform 0.3s ease;
 }
@@ -230,7 +274,6 @@ section {
 
 .about-content {
     display: grid;
-    /* grid-template-columns: 1fr 2fr; */
     gap: 4rem;
     align-items: center;
 }
@@ -249,12 +292,13 @@ section {
 }
 
 .skill-item {
-    background: white;
+    background: var(--bg-primary);
     padding: 1rem;
     border-radius: 8px;
     text-align: center;
     box-shadow: var(--shadow);
     transition: transform 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 .skill-item:hover {
@@ -276,11 +320,12 @@ section {
 }
 
 .project-card {
-    background: white;
+    background: var(--bg-primary);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 .project-card:hover {
@@ -370,10 +415,11 @@ section {
 }
 
 .contact-form {
-    background: white;
+    background: var(--bg-primary);
     padding: 2rem;
     border-radius: 12px;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
 }
 
 .form-group {
@@ -394,6 +440,8 @@ section {
     border-radius: 6px;
     font-family: inherit;
     transition: border-color 0.3s ease;
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .form-group input:focus,
@@ -404,9 +452,10 @@ section {
 
 /* Footer */
 footer {
-    background: var(--text-primary);
-    color: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     padding: 3rem 2rem 1rem;
+    border-top: 1px solid var(--border-color);
 }
 
 .footer-content {
@@ -474,10 +523,11 @@ footer {
         top: 100%;
         left: 0;
         width: 100%;
-        background: white;
+        background: var(--bg-primary);
         flex-direction: column;
         padding: 1rem;
         box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
     }
 
     .nav-links.active {
@@ -487,6 +537,11 @@ footer {
 
     .mobile-menu-toggle {
         display: block;
+    }
+
+    .theme-toggle {
+        order: -1;
+        margin-right: 1rem;
     }
 
     .hero {
@@ -542,6 +597,11 @@ footer {
 
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .theme-toggle {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
     }
 }
 

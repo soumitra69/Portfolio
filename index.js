@@ -1,3 +1,4 @@
+
 // Mobile menu toggle
 const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
 const navLinks = document.querySelector('.nav-links');
@@ -23,9 +24,9 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 window.addEventListener('scroll', () => {
     const header = document.querySelector('header');
     if (window.scrollY > 100) {
-        header.style.background = 'rgba(255, 255, 255, 0.98)';
+        header.style.background = 'rgba(var(--bg-primary-rgb), 0.98)';
     } else {
-        header.style.background = 'rgba(255, 255, 255, 0.95)';
+        header.style.background = 'var(--bg-primary)';
     }
 });
 
@@ -34,6 +35,36 @@ document.querySelector('.contact-form').addEventListener('submit', (e) => {
     e.preventDefault();
     alert('Thank you for your message! I\'ll get back to you soon.');
     e.target.reset();
+});
+
+// Theme Toggle Functionality
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = themeToggle.querySelector('i');
+const themeText = themeToggle.querySelector('span');
+
+// Check for saved theme preference or default to 'light'
+const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+
+// Update toggle button based on current theme
+function updateThemeToggle(theme) {
+    if (theme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+        themeText.textContent = 'Light';
+    } else {
+        themeIcon.className = 'fas fa-moon';
+        themeText.textContent = 'Dark';
+    }
+}
+
+// Initialize theme
+updateThemeToggle(currentTheme);
+
+themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    updateThemeToggle(newTheme);
 });
 
 // Intersection Observer for animations
