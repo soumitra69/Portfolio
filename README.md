@@ -1,7 +1,7 @@
 
 #  🧑‍💻 Personal Portfolio
 
-Live Demo: [View Website](https://soumitra69.github.io/Profilo_Template/)
+Live Demo: [View Website](https://soumitra69.github.io/Portfolio/)
 
 A modern, responsive portfolio website template for developers and designers. This template features a clean design with smooth animations and professional presentation of skills and projects.
 
@@ -35,13 +35,13 @@ A modern, responsive portfolio website template for developers and designers. Th
 
 1. **Download the Template**
    ```bash
-   git clone https://github.com/soumitra69/Profilo_Template.git
+   git clone https://soumitra69.github.io/Portfolio/.git
    ```
    OR download as ZIP file and extract
 
 2. **Navigate to Project Directory**
    ```bash
-   cd Profilo_Template
+   cd Portfolio
    ```
 
 3. **Open in Text Editor**
@@ -51,15 +51,7 @@ A modern, responsive portfolio website template for developers and designers. Th
 4. **View the Template**
    - Open `index.html` in your web browser
    - OR use a local server (recommended):
-     ```bash
-     # Using Python 3
-     python -m http.server 8000
-     
-     # Using Node.js (if you have live-server installed)
-     npx live-server
-     ```
 
-### Customization
 
 #### Personal Information
 - Edit the content in `index.html`
@@ -125,9 +117,6 @@ Profilo_Template/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Support
 
@@ -137,7 +126,6 @@ If you have any questions or need help with customization:
 
 ## Acknowledgments
 
-- Bootstrap team for the responsive framework
 - Font Awesome for the icon library
 - Google Fonts for typography
 - All contributors and users of this template
