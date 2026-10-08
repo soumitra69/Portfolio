@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import defaultProfile from "../../shared/profile.json";
+import defaultProfile from "../shared/profile.json";
 
 export default function ProfilePhoto() {
   const [photoUrl, setPhotoUrl] = useState(defaultProfile.photoUrl);

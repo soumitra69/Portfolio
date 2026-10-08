@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import skillIcons from "../../shared/skill-icons.json";
+import skillIcons from "../shared/skill-icons.json";
 
 const emptySkill = { name: "", icon: "fa-solid fa-code" };
 

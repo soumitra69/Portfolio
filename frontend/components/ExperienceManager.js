@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import employmentTypes from "../../shared/employment-types.json";
-import { formatMonth } from "../../shared/format-month";
+import employmentTypes from "../shared/employment-types.json";
+import { formatMonth } from "../shared/format-month.js";
 
 const emptyExperience = { company: "", role: "", employmentType: "Full-time", startDate: "", endDate: "", current: false, description: "" };
 

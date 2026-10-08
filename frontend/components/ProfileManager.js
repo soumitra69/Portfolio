@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import defaultProfile from "../../shared/profile.json";
+import defaultProfile from "../shared/profile.json";
 
 export default function ProfileManager({ profile, busy, run, refresh, request }) {
   const [file, setFile] = useState(null);

@@ -1,0 +1,39 @@
+[
+  {
+    "id": "project-1",
+    "title": "Digital Marketing Agency Website",
+    "description": "A clean and modern landing page for a fictional digital marketing agency, built using HTML, CSS, and responsive design principles.",
+    "image": "/assets/Digital_Marketing_Agency_Website_ (1).png",
+    "technologies": [
+      "HTML5",
+      "CSS3"
+    ],
+    "demoUrl": "https://soumitra69.github.io/Digital_Marketing_Agency_Website/",
+    "githubUrl": "https://github.com/soumitra69/Digital_Marketing_Agency_Website"
+  },
+  {
+    "id": "project-2",
+    "title": "Cryptocurrency Price Tracker Website",
+    "description": "A simple, responsive cryptocurrency tracker UI built with only HTML and CSS. This project showcases a clean front-end layout for a crypto price tracker interface.",
+    "image": "/assets/soumitra69.github.io_Cryptocurrency_Price_Tracker_Website_.png",
+    "technologies": [
+      "HTML5",
+      "CSS3"
+    ],
+    "demoUrl": "https://soumitra69.github.io/Cryptocurrency_Price_Tracker_Website/",
+    "githubUrl": "https://github.com/soumitra69/Cryptocurrency_Price_Tracker_Website"
+  },
+  {
+    "id": "project-3",
+    "title": "Movie streaming download website",
+    "description": "A sleek and responsive movie streaming website UI made using HTML, CSS, and JavaScript.",
+    "image": "/assets/CineFlix-A-stylish-movie-streaming-download-website_.png",
+    "technologies": [
+      "HTML5",
+      "CSS3",
+      "JavaScript"
+    ],
+    "demoUrl": "https://soumitra69.github.io/CineFlix-A-stylish-movie-streaming-download-website/",
+    "githubUrl": "https://github.com/soumitra69/CineFlix-A-stylish-movie-streaming-download-website"
+  }
+]

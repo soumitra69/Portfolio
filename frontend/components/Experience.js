@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatMonth } from "../../shared/format-month";
+import { formatMonth } from "../shared/format-month.js";
 
 export default function Experience() {
   const [experience, setExperience] = useState([]);

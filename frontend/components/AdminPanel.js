@@ -5,7 +5,7 @@ import Link from "next/link";
 import SkillManager from "./SkillManager";
 import ExperienceManager from "./ExperienceManager";
 import ProfileManager from "./ProfileManager";
-import defaultProfile from "../../shared/profile.json";
+import defaultProfile from "../shared/profile.json";
 import "./admin.css";
 
 const emptyProject = { title: "", description: "", image: "", demoUrl: "", githubUrl: "", technologies: "" };

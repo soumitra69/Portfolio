@@ -1,0 +1,7 @@
+[
+  { "id": "skill-html", "name": "HTML", "icon": "fa-brands fa-html5" },
+  { "id": "skill-css", "name": "CSS3", "icon": "fa-brands fa-css3-alt" },
+  { "id": "skill-javascript", "name": "JavaScript", "icon": "fa-brands fa-js" },
+  { "id": "skill-bootstrap", "name": "Bootstrap", "icon": "fa-brands fa-bootstrap" },
+  { "id": "skill-react", "name": "React", "icon": "fa-brands fa-react" }
+]
