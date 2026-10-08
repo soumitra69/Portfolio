@@ -2,9 +2,9 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
-import seedProjects from "../../frontend/shared/projects.json" with { type: "json" };
-import seedSkills from "../../frontend/shared/skills.json" with { type: "json" };
-import defaultProfile from "../../frontend/shared/profile.json" with { type: "json" };
+import seedProjects from "../shared/projects.json" with { type: "json" };
+import seedSkills from "../shared/skills.json" with { type: "json" };
+import defaultProfile from "../shared/profile.json" with { type: "json" };
 
 export function createStore(filename = process.env.DATA_FILE || fileURLToPath(new URL("../data/portfolio.json", import.meta.url))) {
   let queue = Promise.resolve();

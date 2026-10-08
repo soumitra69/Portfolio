@@ -43,9 +43,10 @@ Portfolio/
     components/          # Navigation, contact form, projects, admin panel
     public/assets/       # Original portfolio images
     next.config.mjs      # Proxy /api requests to the backend
-    shared/              # Portfolio seed data and utilities used by both apps
+    shared/              # Frontend fallback data and presentation utilities
   backend/
     src/                 # Express API, authentication, JSON storage
+    shared/              # Backend seed data and utilities for standalone deployment
     scripts/             # Local admin credential setup
     test/                # API integration tests
     data/portfolio.json  # Created when data is saved; excluded from Git
@@ -58,7 +59,7 @@ Portfolio/
 
 ## Configuration
 
-Copy `frontend/.env.local.example` to `frontend/.env.local` if changing `BACKEND_URL` (default `http://127.0.0.1:5000`). Next.js uses this for its server proxy; restart/rebuild after changing it. If the backend port changes, update this URL too.
+Copy `frontend/.env.local.example` to `frontend/.env.local` to use the hosted backend at `https://portfolio-backend-vs7k.onrender.com`. Next.js uses `BACKEND_URL` for its server proxy; restart/rebuild after changing it. Without an override, development uses `http://127.0.0.1:5000` and production uses the Render URL. Set `BACKEND_URL=http://127.0.0.1:5000` when using the local backend instead.
 
 The backend reads `backend/.env`:
 
@@ -100,7 +101,7 @@ Customize static hero/about/skills/contact content in `frontend/app/page.js`, st
 
 Use `Portfolio/` as the single Git repository root. The frontend, backend, shared data, root package files, and development scripts all belong to this repository. Do not initialize separate Git repositories inside `frontend/` or `backend/`. The former nested repositories' Git metadata was preserved locally under `.git/repository-backups/`; it is not published.
 
-The frontend owns `frontend/shared/`, so its production imports stay inside the app. The backend reads the same files through `../../frontend/shared/`. All six required shared files are included: `employment-types.json`, `format-month.js`, `profile.json`, `projects.json`, `skills.json`, and `skill-icons.json`.
+The frontend owns `frontend/shared/`, and the backend owns `backend/shared/`, so each app's imports stay inside its deployable directory. The backend imports its seed data through `../shared/` from `src/`; it can start without the frontend folder. Both directories include the six required files: `employment-types.json`, `format-month.js`, `profile.json`, `projects.json`, `skills.json`, and `skill-icons.json`. Existing saved backend data still takes precedence over its seed defaults.
 
 Install and build from either the repository root or the frontend:
 
@@ -128,7 +129,7 @@ For Netlify, connect the GitHub repository containing the entire `Portfolio/` pr
 
 The configuration enables Netlify's Next.js adapter. Keep the Next.js server build; do not change this app to a static export, because its API proxy and admin features require server support.
 
-Netlify hosts the frontend. Deploy the existing Express backend separately with persistent storage, and set `BACKEND_URL` in Netlify's environment settings to that backend's HTTPS origin before building. The local default (`http://127.0.0.1:5000`) is for local development. Set backend credentials and other secrets on the backend host; do not put them in the frontend or Git. This repository change does not deploy the backend or migrate its data.
+Netlify hosts the frontend. The production API proxy defaults to `https://portfolio-backend-vs7k.onrender.com`; you can also set `BACKEND_URL` in Netlify's environment settings to that origin before building. The local development default is `http://127.0.0.1:5000`. Deploy the Express backend separately with persistent storage. Set backend credentials and other secrets on the backend host; do not put them in the frontend or Git.
 
 `.env`, `.env.local`, other local environment files, `node_modules/`, `.next/`, `.netlify/`, and backend data/uploads are ignored. Only `.env*.example` templates belong in Git; never put actual secrets in them.
 

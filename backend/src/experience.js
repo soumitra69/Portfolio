@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
-import employmentTypes from "../../frontend/shared/employment-types.json" with { type: "json" };
+import employmentTypes from "../shared/employment-types.json" with { type: "json" };
 
 function validateExperience(input) {
   const { company, role, employmentType, startDate, endDate, current, description = "" } = input || {};

@@ -1,0 +1,18 @@
+[
+  { "label": "Code / Other", "value": "fa-solid fa-code" },
+  { "label": "HTML", "value": "fa-brands fa-html5" },
+  { "label": "CSS", "value": "fa-brands fa-css3-alt" },
+  { "label": "JavaScript", "value": "fa-brands fa-js" },
+  { "label": "Bootstrap", "value": "fa-brands fa-bootstrap" },
+  { "label": "React / Next.js", "value": "fa-brands fa-react" },
+  { "label": "Node.js", "value": "fa-brands fa-node-js" },
+  { "label": "Python", "value": "fa-brands fa-python" },
+  { "label": "Java", "value": "fa-brands fa-java" },
+  { "label": "PHP", "value": "fa-brands fa-php" },
+  { "label": "Git", "value": "fa-brands fa-git-alt" },
+  { "label": "GitHub", "value": "fa-brands fa-github" },
+  { "label": "Docker", "value": "fa-brands fa-docker" },
+  { "label": "Database", "value": "fa-solid fa-database" },
+  { "label": "Cloud", "value": "fa-solid fa-cloud" },
+  { "label": "Design", "value": "fa-solid fa-palette" }
+]

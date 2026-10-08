@@ -4,7 +4,7 @@ import { mkdir, writeFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
-import defaultProfile from "../../frontend/shared/profile.json" with { type: "json" };
+import defaultProfile from "../shared/profile.json" with { type: "json" };
 
 export const defaultUploadDirectory = fileURLToPath(new URL("../data/uploads/", import.meta.url));
 

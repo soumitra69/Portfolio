@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { rateLimit } from "express-rate-limit";
 import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
-import skillIcons from "../../frontend/shared/skill-icons.json" with { type: "json" };
+import skillIcons from "../shared/skill-icons.json" with { type: "json" };
 import { createExperienceRouter } from "./experience.js";
 import { createProfileRouter } from "./profile.js";
 
