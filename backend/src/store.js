@@ -5,8 +5,17 @@ import { fileURLToPath } from "node:url";
 import seedProjects from "../shared/projects.json" with { type: "json" };
 import seedSkills from "../shared/skills.json" with { type: "json" };
 import defaultProfile from "../shared/profile.json" with { type: "json" };
+import { createMongoStore } from "./mongo-store.js";
 
-export function createStore(filename = process.env.DATA_FILE || fileURLToPath(new URL("../data/portfolio.json", import.meta.url))) {
+export function createStore(filename) {
+  const local = createFileStore(filename);
+  if (filename === undefined && process.env.MONGODB_URI) {
+    return createMongoStore(process.env.MONGODB_URI, { loadInitialData: local.read });
+  }
+  return local;
+}
+
+export function createFileStore(filename = process.env.DATA_FILE || fileURLToPath(new URL("../data/portfolio.json", import.meta.url))) {
   let queue = Promise.resolve();
 
   async function read() {
@@ -33,5 +42,5 @@ export function createStore(filename = process.env.DATA_FILE || fileURLToPath(ne
     return task;
   }
 
-  return { read: () => queue.then(read), update };
+  return { read: () => queue.then(read), update, close: async () => { await queue; } };
 }

@@ -10,11 +10,14 @@
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch src/server.js",
     "start": "node --env-file-if-exists=.env src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "check:db": "node --env-file-if-exists=.env scripts/check-db.js",
+    "setup:admin:db": "node --env-file-if-exists=.env scripts/setup-admin-db.js"
   },
   "dependencies": {
     "express": "^5.0.0",
     "express-rate-limit": "^8.0.0",
+    "mongodb": "^7.7.0",
     "sharp": "^0.34.0"
   }
 }

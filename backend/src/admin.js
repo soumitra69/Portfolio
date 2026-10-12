@@ -47,31 +47,45 @@ export function createAdminRouter({ store, uploadDirectory, username = process.e
   });
 
   router.post("/login", rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: "draft-8", legacyHeaders: false,
-    message: { message: "Too many login attempts. Try again in 15 minutes." } }), (request, response) => {
-    if (!username || !password) {
-      return response.status(503).json({ message: "Admin login is not configured. Set ADMIN_USERNAME and ADMIN_PASSWORD in backend/.env." });
+    message: { message: "Too many login attempts. Try again in 15 minutes." } }), async (request, response) => {
+    let account;
+    if (store.authenticateAdmin) {
+      try {
+        account = await store.authenticateAdmin(request.body?.username, request.body?.password);
+      } catch (error) {
+        console.error(`Admin database login failed (${error.code === "ADMIN_NOT_CONFIGURED" ? error.message : error.name}).`);
+        return response.status(503).json({ message: error.code === "ADMIN_NOT_CONFIGURED"
+          ? "The admin account has not been created in the database yet."
+          : "The admin service is unavailable. Please try again shortly." });
+      }
+    } else {
+      if (!username || !password) {
+        return response.status(503).json({ message: "Admin login is not configured. Set ADMIN_USERNAME and ADMIN_PASSWORD in the backend environment." });
+      }
+      if (matches(request.body?.username, username) && matches(request.body?.password, password)) account = { username };
     }
-    if (!matches(request.body?.username, username) || !matches(request.body?.password, password)) {
+    if (!account) {
       return response.status(401).json({ message: "Incorrect username or password." });
     }
-    for (const [token, expiresAt] of sessions) if (expiresAt < Date.now()) sessions.delete(token);
+    for (const [token, session] of sessions) if (session.expiresAt < Date.now()) sessions.delete(token);
     const token = randomBytes(32).toString("hex");
-    sessions.set(token, Date.now() + SESSION_DURATION);
+    sessions.set(token, { username: account.username, expiresAt: Date.now() + SESSION_DURATION });
     response.cookie("portfolio_admin", token, { ...cookieOptions, maxAge: SESSION_DURATION });
-    response.json({ username });
+    response.json({ username: account.username });
   });
 
   router.use((request, response, next) => {
     const token = request.get("Cookie")?.split(";").map((item) => item.trim()).find((item) => item.startsWith("portfolio_admin="))?.slice("portfolio_admin=".length);
-    if (!token || !sessions.has(token) || sessions.get(token) <= Date.now()) {
+    if (!token || !sessions.has(token) || sessions.get(token).expiresAt <= Date.now()) {
       if (token) sessions.delete(token);
       return response.status(401).json({ message: "Please sign in to continue." });
     }
     request.adminToken = token;
+    request.adminUsername = sessions.get(token).username;
     next();
   });
 
-  router.get("/session", (_request, response) => response.json({ username }));
+  router.get("/session", (request, response) => response.json({ username: request.adminUsername }));
   router.use(createExperienceRouter(store));
   router.use(createProfileRouter({ store, uploadDirectory }));
   router.post("/logout", (request, response) => {
