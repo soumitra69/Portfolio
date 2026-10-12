@@ -7,7 +7,10 @@ const buildRoot = fileURLToPath(new URL(
   existsSync(new URL("../package-lock.json", import.meta.url)) ? "../" : "./",
   import.meta.url,
 ));
-const backendUrl = (process.env.BACKEND_URL || "http://127.0.0.1:5000").replace(/\/$/, "");
+const defaultBackendUrl = process.env.NODE_ENV === "production"
+  ? "https://portfolio-backend-vs7k.onrender.com"
+  : "http://127.0.0.1:5000";
+const backendUrl = (process.env.BACKEND_URL || defaultBackendUrl).replace(/\/$/, "");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
