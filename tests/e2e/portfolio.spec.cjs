@@ -4,8 +4,8 @@ const { mkdir } = require("node:fs/promises");
 test("existing sections, desktop links, dark theme and contact validation work", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
-  await expect(page.locator("main section")).toHaveCount(5);
-  expect(await page.locator("main section").evaluateAll((sections) => sections.map((section) => section.id))).toEqual(["home", "about", "experience", "projects", "contact"]);
+  await expect(page.locator("main section")).toHaveCount(9);
+  expect(await page.locator("main section").evaluateAll((sections) => sections.map((section) => section.id))).toEqual(["home", "about", "skills", "services", "experience", "education", "projects", "gallery", "contact"]);
   await expect(page.getByRole("heading", { name: "Hi, I'm Soumitra Samanta" })).toBeVisible();
   await expect(page.locator(".project-card")).toHaveCount(3);
   await expect(page.locator(".project-links a")).toHaveCount(6);
@@ -38,9 +38,10 @@ test("existing work-together CTA submits an inquiry; admin manages it and reads 
   await page.getByRole("button", { name: "Send Project Inquiry" }).click();
   await expect(page.getByRole("status")).toContainText("Your project inquiry has been received");
   await page.goto("/admin");
-  await page.getByLabel("Username").fill("admin@gmail.com"); await page.getByLabel("Password").fill("Admin");
+  await page.getByLabel("Username").fill("browser-admin@example.test"); await page.getByLabel("Password").fill("Browser-test-only-passphrase");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: /Messages/ }).click();
   await expect(page.getByText("Browser contact check", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Details", exact: true }).click();
   await expect(page.getByText("SMTP is not configured", { exact: true })).toBeVisible();
@@ -105,7 +106,7 @@ test("a failed contact request reports an error and preserves entered details fo
   await page.getByLabel("Email", { exact: true }).fill("retry@example.test");
   await page.getByLabel("Subject", { exact: true }).fill("Retry check");
   await page.getByLabel("Message", { exact: true }).fill("Keep my details if the server is unavailable.");
-  await page.route("**/api/contact", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ message: "The service is temporarily unavailable." }) }));
+  await page.route("**/api/messages", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ message: "The service is temporarily unavailable." }) }));
   await page.getByRole("button", { name: "Send Message", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("temporarily unavailable");
   await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Retry visitor");

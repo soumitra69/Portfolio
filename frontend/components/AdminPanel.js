@@ -1,207 +1,466 @@
 "use client";
-
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import SkillManager from "./SkillManager";
-import ExperienceManager from "./ExperienceManager";
-import ProfileManager from "./ProfileManager";
-import defaultProfile from "../shared/profile.json";
+import CMSManager, { ProfilePhotoManager, MediaLibrary } from "./CMSManager";
 import SubmissionInbox from "./SubmissionInbox";
 import VisitorStatistics from "./VisitorStatistics";
+import definitions from "../shared/cms-fields.json";
 import "./admin.css";
-
-const emptyProject = { title: "", description: "", image: "", demoUrl: "", githubUrl: "", technologies: "" };
-const imagePaths = [
-  "/assets/Digital_Marketing_Agency_Website_ (1).png",
-  "/assets/soumitra69.github.io_Cryptocurrency_Price_Tracker_Website_.png",
-  "/assets/CineFlix-A-stylish-movie-streaming-download-website_.png",
-  "/assets/DSC_0068.JPG",
-];
-
 async function api(path, options = {}) {
-  const response = await fetch(`/api${path}`, {
-    ...options, cache: "no-store", signal: AbortSignal.timeout(15000),
-    headers: { "Content-Type": "application/json", "X-Admin-Request": "1", ...options.headers },
-  });
-  const body = await response.json().catch(() => null);
-  if (!response.ok) {
-    const error = new Error(body?.message || (response.status >= 500
-      ? "The admin service is unavailable. Please try again shortly."
-      : "Request failed. Please try again."));
-    error.status = response.status;
-    throw error;
+  const canRetry = !options.method || options.method === "GET";
+  for (let attempt = 0; attempt < (canRetry ? 2 : 1); attempt++) {
+    let response;
+    try {
+      response = await fetch("/api" + path, {
+        ...options,
+        cache: "no-store",
+        signal: AbortSignal.timeout(30000),
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Request": "1",
+          ...options.headers,
+        },
+      });
+    } catch (error) {
+      if (canRetry && attempt === 0 && error instanceof TypeError) continue;
+      throw error;
+    }
+    const body = await response.json().catch(() => null);
+    if (!response.ok) {
+      if (
+        canRetry &&
+        attempt === 0 &&
+        [502, 503, 504].includes(response.status)
+      )
+        continue;
+      const error = new Error(
+        body?.message || "The admin service is unavailable. Please try again.",
+      );
+      error.status = response.status;
+      error.fields = body?.errors;
+      throw error;
+    }
+    return body;
   }
-  return body;
 }
-
+const tabs = [
+  ["dashboard", "Dashboard", "fa-gauge-high"],
+  ["navigation", "Navigation", "fa-compass"],
+  ["profile", "Profile", "fa-user"],
+  ["about", "About", "fa-address-card"],
+  ["contactInfo", "Contact information", "fa-address-book"],
+  ["photo", "Profile DP", "fa-camera"],
+  ["services", "Services", "fa-laptop-code"],
+  ["projects", "Projects", "fa-code"],
+  ["skills", "Skills", "fa-layer-group"],
+  ["experience", "Experience", "fa-briefcase"],
+  ["education", "Education", "fa-graduation-cap"],
+  ["gallery", "Gallery", "fa-images"],
+  ["socialLinks", "Social links", "fa-link"],
+  ["messages", "Messages", "fa-envelope"],
+  ["inquiries", "Inquiries", "fa-handshake"],
+  ["analytics", "Visitors", "fa-chart-bar"],
+  ["settings", "Settings", "fa-gear"],
+  ["sections", "Section order", "fa-list"],
+  ["media", "Image library", "fa-photo-film"],
+];
 export default function AdminPanel() {
   const [session, setSession] = useState(null);
   const [checking, setChecking] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [cms, setCms] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inquiries, setInquiries] = useState([]);
   const [analytics, setAnalytics] = useState(null);
-  const [overview, setOverview] = useState({ messages: 0, unread: 0, inquiries: 0, newInquiries: 0 });
   const [notifications, setNotifications] = useState({ configured: false });
-  const [projects, setProjects] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [experience, setExperience] = useState([]);
-  const [profile, setProfile] = useState(defaultProfile);
-  const [tab, setTab] = useState("messages");
-  const [notice, setNotice] = useState({ error: false, text: "" });
+  const [overview, setOverview] = useState({
+    messages: 0,
+    unread: 0,
+    inquiries: 0,
+    newInquiries: 0,
+  });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [tab, setTab] = useState("dashboard");
   const [busy, setBusy] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [projectForm, setProjectForm] = useState(emptyProject);
-
+  const [notice, setNotice] = useState({ error: false, text: "" });
   const handleError = useCallback((error) => {
-    if (error.status === 401) setSession(null);
-    setNotice({ error: true, text: error instanceof TypeError || error.name === "TimeoutError"
-      ? "Unable to reach the server. Please try again." : error.message });
+    if (error.status === 401) {
+      setSession(null);
+      setCms(null);
+    }
+    setNotice({
+      error: true,
+      text:
+        error.name === "TimeoutError" || error instanceof TypeError
+          ? "Unable to reach the server. Please try again."
+          : error.message,
+    });
   }, []);
-
   const refresh = useCallback(async () => {
-    const [inbox, portfolio, skillList, history, personal] = await Promise.all([api("/admin/messages"), api("/projects"), api("/skills"), api("/experience"), api("/profile")]);
-    setMessages(inbox);
-    setProjects(portfolio);
-    setSkills(skillList);
-    setExperience(history);
-    setProfile(personal);
-    const [inquiryList, visits, summary, mail] = await Promise.all([api("/admin/inquiries"), api("/admin/analytics"), api("/admin/overview"), api("/admin/notifications/status")]);
-    setInquiries(inquiryList); setAnalytics(visits); setOverview(summary); setNotifications(mail);
+    setLoading(true);
+    try {
+      const [content, inbox, clients, visits, mail, summary] =
+        await Promise.all([
+          api("/admin/cms"),
+          api("/admin/messages"),
+          api("/admin/inquiries"),
+          api("/admin/analytics"),
+          api("/admin/notifications/status"),
+          api("/admin/overview"),
+        ]);
+      setCms(content);
+      setMessages(inbox);
+      setInquiries(clients);
+      setAnalytics(visits);
+      setNotifications(mail);
+      setOverview(summary);
+    } finally {
+      setLoading(false);
+    }
   }, []);
-
   useEffect(() => {
     let active = true;
     api("/admin/session")
-      .then(async (user) => { if (active) { setSession(user); await refresh(); } })
-      .catch((error) => { if (active && error.status !== 401) handleError(error); })
-      .finally(() => { if (active) setChecking(false); });
-    return () => { active = false; };
+      .then(async (user) => {
+        if (active) {
+          setSession(user);
+          await refresh();
+        }
+      })
+      .catch((error) => {
+        if (active && error.status !== 401) handleError(error);
+      })
+      .finally(() => {
+        if (active) setChecking(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [refresh, handleError]);
-
   async function run(action, success) {
     if (busy) return;
     setBusy(true);
     setNotice({ error: false, text: "" });
     try {
       await action();
+      if (typeof BroadcastChannel !== "undefined") {
+        const channel = new BroadcastChannel("portfolio-content");
+        channel.postMessage("updated");
+        channel.close();
+      }
       if (success) setNotice({ error: false, text: success });
-    } catch (error) { handleError(error); }
-    finally { setBusy(false); }
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setBusy(false);
+    }
   }
-
   function login(event) {
     event.preventDefault();
     const credentials = Object.fromEntries(new FormData(event.currentTarget));
     run(async () => {
-      const user = await api("/admin/login", { method: "POST", body: JSON.stringify(credentials) });
+      const user = await api("/admin/login", {
+        method: "POST",
+        body: JSON.stringify(credentials),
+      });
       setSession(user);
       await refresh();
     });
   }
-
-  function editProject(project) {
-    setEditing(project?.id || null);
-    setProjectForm(project ? { ...project, technologies: project.technologies.join(", ") } : emptyProject);
-  }
-
-  function saveProject(event) {
-    event.preventDefault();
-    run(async () => {
-      await api(`/admin/projects${editing ? `/${editing}` : ""}`, {
-        method: editing ? "PUT" : "POST",
-        body: JSON.stringify({ ...projectForm, technologies: projectForm.technologies.split(",").map((tech) => tech.trim()).filter(Boolean) }),
-      });
-      editProject(null);
-      await refresh();
-    }, editing ? "Project updated." : "Project added.");
-  }
-
-  const noticeView = <p className={`admin-notice${notice.error ? " is-error" : ""}`} role="status" aria-live="polite">{notice.text}</p>;
-
-  if (checking) return <div className="admin-page admin-login"><p role="status">Loading admin panel…</p></div>;
-
-  if (!session) return (
-    <div className="admin-page admin-login">
-      <div className="admin-login-card">
-        <div className="admin-brand"><i className="fas fa-layer-group" aria-hidden="true" /> Portfolio Admin</div>
-        <h1>Welcome back</h1>
-        <p>Sign in to manage your portfolio and contact messages.</p>
-        <form onSubmit={login}>
-          <label htmlFor="admin-username">Username</label>
-          <input id="admin-username" name="username" autoComplete="username" required maxLength={100} />
-          <label htmlFor="admin-password">Password</label>
-          <input id="admin-password" name="password" type="password" autoComplete="current-password" required maxLength={256} />
-          <button className="admin-primary" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
-        </form>
-        {noticeView}
-        <Link href="/" className="admin-back">← Back to portfolio</Link>
-      </div>
-    </div>
+  const noticeView = (
+    <p
+      className={"admin-notice" + (notice.error ? " is-error" : "")}
+      role="status"
+      aria-live="polite"
+    >
+      {notice.text}
+    </p>
   );
-
+  if (checking)
+    return (
+      <div className="admin-page admin-login">
+        <p role="status">Loading admin panel?</p>
+      </div>
+    );
+  if (!session)
+    return (
+      <div className="admin-page admin-login">
+        <div className="admin-login-card">
+          <div className="admin-brand">
+            <i className="fas fa-layer-group" aria-hidden="true" /> Portfolio
+            Admin
+          </div>
+          <h1>Welcome back</h1>
+          <p>Sign in to manage your portfolio and contact messages.</p>
+          <form onSubmit={login}>
+            <label htmlFor="admin-username">Username</label>
+            <input
+              id="admin-username"
+              name="username"
+              autoComplete="username"
+              required
+              maxLength={100}
+            />
+            <label htmlFor="admin-password">Password</label>
+            <input
+              id="admin-password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              maxLength={256}
+            />
+            <button className="admin-primary" disabled={busy}>
+              {busy ? "Signing in?" : "Sign in"}
+            </button>
+          </form>
+          {noticeView}
+          <Link href="/" className="admin-back">
+            ? Back to portfolio
+          </Link>
+        </div>
+      </div>
+    );
+  const current = tabs.find((item) => item[0] === tab);
+  const counts = [
+    ["Projects", cms?.projects?.length || 0, "fa-code"],
+    ["Services", cms?.services?.length || 0, "fa-laptop-code"],
+    ["Skills", cms?.skills?.length || 0, "fa-layer-group"],
+    ["Gallery items", cms?.gallery?.length || 0, "fa-images"],
+    ["Experience", cms?.experience?.length || 0, "fa-briefcase"],
+    ["Education", cms?.education?.length || 0, "fa-graduation-cap"],
+    ["Messages", overview.messages, "fa-envelope"],
+    ["Inquiries", overview.inquiries, "fa-handshake"],
+  ];
+  function recent(label, records, title, key) {
+    return (
+      <article className="admin-project">
+        <div className="admin-section-heading">
+          <h3>{label}</h3>
+          <button onClick={() => setTab(key)}>View all</button>
+        </div>
+        {records.length ? (
+          records
+            .toSorted(
+              (a, b) =>
+                new Date(b.createdAt || b.updatedAt || 0) -
+                new Date(a.createdAt || a.updatedAt || 0),
+            )
+            .slice(0, 4)
+            .map((record) => (
+              <div className="cms-recent-item" key={record.id}>
+                <strong>{record[title]}</strong>
+                <span>
+                  {record.status ||
+                    record.subject ||
+                    record.category ||
+                    "Saved content"}
+                </span>
+                {(record.createdAt || record.updatedAt) && (
+                  <time>
+                    {new Date(
+                      record.createdAt || record.updatedAt,
+                    ).toLocaleDateString()}
+                  </time>
+                )}
+              </div>
+            ))
+        ) : (
+          <p className="admin-form-help">No {label.toLowerCase()} yet.</p>
+        )}
+      </article>
+    );
+  }
   return (
     <div className="admin-page admin-dashboard">
       <aside className="admin-sidebar">
-        <div className="admin-brand"><i className="fas fa-layer-group" aria-hidden="true" /> Portfolio Admin</div>
-        <p className="admin-sidebar-label">WORKSPACE</p>
-        <div className="admin-tabs" role="tablist" aria-label="Admin sections">
-          <button id="messages-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "messages"} onClick={() => setTab("messages")}><i className="fas fa-envelope" aria-hidden="true" /> Messages <span>{messages.filter((item) => !item.read).length}</span></button>
-            <button id="inquiries-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "inquiries"} onClick={() => setTab("inquiries")}><i className="fas fa-handshake" aria-hidden="true" /> Inquiries <span>{overview.newInquiries}</span></button>
-            <button id="analytics-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "analytics"} onClick={() => setTab("analytics")}><i className="fas fa-chart-bar" aria-hidden="true" /> Visitors</button>
-          <button id="projects-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "projects"} onClick={() => setTab("projects")}><i className="fas fa-code" aria-hidden="true" /> Projects</button>
-          <button id="skills-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "skills"} onClick={() => setTab("skills")}><i className="fas fa-layer-group" aria-hidden="true" /> Skills</button>
-          <button id="experience-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "experience"} onClick={() => setTab("experience")}><i className="fas fa-briefcase" aria-hidden="true" /> Experience</button>
-          <button id="profile-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "profile"} onClick={() => setTab("profile")}><i className="fas fa-user-circle" aria-hidden="true" /> Profile</button>
+        <div className="admin-brand">
+          <i className="fas fa-layer-group" aria-hidden="true" /> Portfolio
+          Admin
         </div>
-        <Link href="/" className="admin-back">← View portfolio</Link>
+        <button
+          className="admin-menu-button"
+          aria-controls="admin-navigation"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? "Close admin navigation" : "Open admin navigation"}
+        </button>
+        <p className="admin-sidebar-label">YOUR WORKSPACE</p>
+        <div
+          id="admin-navigation"
+          className={"admin-tabs" + (menuOpen ? " is-open" : "")}
+          role="tablist"
+          aria-label="Admin sections"
+        >
+          {tabs.map(([key, label, icon]) => (
+            <button
+              key={key}
+              id={key + "-tab"}
+              role="tab"
+              aria-controls="admin-content"
+              aria-selected={tab === key}
+              onClick={() => {
+                setTab(key);
+                setMenuOpen(false);
+                setNotice({ error: false, text: "" });
+              }}
+            >
+              <i className={"fas " + icon} aria-hidden="true" />
+              {label}
+              {key === "messages" && <span>{overview.unread}</span>}
+              {key === "inquiries" && <span>{overview.newInquiries}</span>}
+            </button>
+          ))}
+        </div>
+        <Link href="/" className="admin-back">
+          ? View portfolio
+        </Link>
       </aside>
       <main className="admin-main">
         <div className="admin-topbar">
-          <div><p className="admin-eyebrow">YOUR PORTFOLIO, AT A GLANCE</p><h1>Dashboard</h1></div>
-          <div className="admin-account"><span>{session.username}</span><button disabled={busy} onClick={() => run(async () => { await api("/admin/logout", { method: "POST" }); setSession(null); setMessages([]); setProjects([]); })}>Sign out</button></div>
-        </div>
-        <div className="admin-stats">
-          <div><span>Total messages</span><strong>{overview.messages}</strong></div>
-          <div><span>Unread messages</span><strong>{overview.unread}</strong></div>
-          <div><span>Project inquiries</span><strong>{overview.inquiries}</strong></div>
-          <div><span>Portfolio projects</span><strong>{projects.length}</strong></div>
+          <div>
+            <p className="admin-eyebrow">
+              WORKSPACE / {current[1].toUpperCase()}
+            </p>
+            <h1>{current[1]}</h1>
+          </div>
+          <div className="admin-account">
+            <span>{session.username}</span>
+            <button
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  await api("/admin/logout", { method: "POST" });
+                  setSession(null);
+                  setCms(null);
+                  setMessages([]);
+                  setInquiries([]);
+                })
+              }
+            >
+              Sign out
+            </button>
+          </div>
         </div>
         {noticeView}
-        {!notifications.configured && <p className="admin-configuration-note">Submissions are saved. Email notifications will start once SMTP is configured on the backend.</p>}
-        <div className="admin-section-heading"><h2>{{ messages: "Contact messages", inquiries: "Project inquiries", analytics: "Visitor statistics", projects: "Manage projects", skills: "Manage skills", experience: "Manage experience", profile: "Profile photo" }[tab]}</h2><button disabled={busy} onClick={() => run(refresh, "Dashboard refreshed.")}>{busy ? "Working…" : "Refresh"}</button></div>
-        <div id="admin-content" role="tabpanel" aria-labelledby={`${tab}-tab`}>
-          {tab === "messages" || tab === "inquiries" ? (
-            <SubmissionInbox key={tab} kind={tab === "messages" ? "contact" : "inquiry"} records={tab === "messages" ? messages : inquiries} busy={busy} run={run} refresh={refresh} request={api} />
+        {!notifications.configured && (
+          <p className="admin-configuration-note">
+            Submissions are saved. Email notifications need your SMTP host and
+            credentials in the backend environment.
+          </p>
+        )}
+        <div className="admin-section-heading">
+          <h2>
+            {tab === "dashboard"
+              ? "Portfolio overview"
+              : tab === "analytics"
+                ? "Visitor statistics"
+                : tab === "photo"
+                  ? "Manage profile photo"
+                  : current[1]}
+          </h2>
+          <button
+            disabled={busy || loading}
+            onClick={() => run(refresh, "Content refreshed.")}
+          >
+            {loading ? "Loading?" : busy ? "Working?" : "Refresh"}
+          </button>
+        </div>
+        <div
+          id="admin-content"
+          role="tabpanel"
+          aria-labelledby={tab + "-tab"}
+          aria-busy={loading}
+        >
+          {!cms ? (
+            <div className="admin-empty">
+              <p>
+                {loading
+                  ? "Loading portfolio content?"
+                  : "Content could not be loaded. Use Refresh to try again."}
+              </p>
+            </div>
+          ) : tab === "dashboard" ? (
+            <>
+              <div className="admin-stats">
+                {counts.map(([label, value, icon]) => (
+                  <div key={label}>
+                    <i className={"fas " + icon} aria-hidden="true" />
+                    <span>Total {label.toLowerCase()}</span>
+                    <strong>{value}</strong>
+                  </div>
+                ))}
+              </div>
+              <div className="cms-quick-actions">
+                <h3>Quick actions</h3>
+                <div className="admin-actions">
+                  {[
+                    "projects",
+                    "services",
+                    "skills",
+                    "gallery",
+                    "experience",
+                    "education",
+                  ].map((key) => (
+                    <button key={key} onClick={() => setTab(key)}>
+                      + Add{" "}
+                      {key === "gallery"
+                        ? "gallery item"
+                        : key === "experience"
+                          ? "experience"
+                          : key === "education"
+                            ? "education"
+                            : key.slice(0, -1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="cms-recent-grid">
+                {recent("Recent messages", messages, "name", "messages")}
+                {recent("Recent inquiries", inquiries, "name", "inquiries")}
+                {recent("Recent projects", cms.projects, "title", "projects")}
+                {recent(
+                  "Recent gallery uploads",
+                  cms.gallery,
+                  "title",
+                  "gallery",
+                )}
+              </div>
+            </>
+          ) : tab === "messages" || tab === "inquiries" ? (
+            <SubmissionInbox
+              key={tab}
+              kind={tab === "messages" ? "contact" : "inquiry"}
+              records={tab === "messages" ? messages : inquiries}
+              busy={busy}
+              run={run}
+              refresh={refresh}
+              request={api}
+            />
           ) : tab === "analytics" ? (
             <VisitorStatistics analytics={analytics} />
-          ) : tab === "skills" ? (
-            <SkillManager skills={skills} busy={busy} run={run} refresh={refresh} request={api} />
-          ) : tab === "experience" ? (
-            <ExperienceManager experience={experience} busy={busy} run={run} refresh={refresh} request={api} />
-          ) : tab === "profile" ? (
-            <ProfileManager profile={profile} busy={busy} run={run} refresh={refresh} request={api} />
-          ) : (
-            <div className="admin-project-layout">
-              <div className="admin-project-list">
-                {!projects.length && <p className="admin-empty">Add your first project using the form.</p>}
-                {projects.map((project) => <article className="admin-project" key={project.id}><h3>{project.title}</h3><p>{project.description}</p><div className="admin-actions"><button disabled={busy} onClick={() => editProject(project)}>Edit</button><a href={project.demoUrl} target="_blank" rel="noopener noreferrer">View demo</a><button className="admin-danger" disabled={busy} onClick={() => { if (window.confirm(`Delete "${project.title}" from your portfolio?`)) run(async () => { await api(`/admin/projects/${project.id}`, { method: "DELETE" }); if (editing === project.id) editProject(null); await refresh(); }, "Project deleted."); }}>Delete</button></div></article>)}
-              </div>
-              <form className="admin-project-form" onSubmit={saveProject}>
-                <h3>{editing ? "Edit project" : "Add a project"}</h3>
-                {[
-                  ["title", "Project title", "text", 150],
-                  ["description", "Description", "textarea", 2000],
-                  ["image", "Image path", "text", 250],
-                  ["demoUrl", "Live demo URL", "url", 2000],
-                  ["githubUrl", "GitHub URL", "url", 2000],
-                  ["technologies", "Technologies (comma separated)", "text", 400],
-                ].map(([field, label, type, maxLength]) => <div key={field}><label htmlFor={`project-${field}`}>{label}</label>{type === "textarea" ? <textarea id={`project-${field}`} rows={4} required maxLength={maxLength} value={projectForm[field]} onChange={(event) => setProjectForm({ ...projectForm, [field]: event.target.value })} /> : <input id={`project-${field}`} type={type} list={field === "image" ? "project-images" : undefined} placeholder={field === "image" ? "/assets/your-image.png" : undefined} required maxLength={maxLength} value={projectForm[field]} onChange={(event) => setProjectForm({ ...projectForm, [field]: event.target.value })} />}</div>)}
-                <datalist id="project-images">{imagePaths.map((path) => <option key={path} value={path} />)}</datalist>
-                <p className="admin-form-help">Choose an existing image path, or add an image to the portfolio assets folder first.</p>
-                <div className="admin-actions"><button className="admin-primary" disabled={busy}>{busy ? "Saving…" : editing ? "Save changes" : "Add project"}</button>{editing && <button type="button" disabled={busy} onClick={() => editProject(null)}>Cancel edit</button>}</div>
-              </form>
-            </div>
-          )}
+          ) : tab === "photo" ? (
+            <ProfilePhotoManager
+              profile={cms.profile}
+              busy={busy}
+              run={run}
+              refresh={refresh}
+              request={api}
+            />
+          ) : tab === "media" ? (
+            <MediaLibrary request={api} run={run} busy={busy} revision={cms} />
+          ) : definitions[tab] ? (
+            <CMSManager
+              key={tab}
+              kind={tab}
+              content={cms[tab]}
+              busy={busy}
+              run={run}
+              refresh={refresh}
+              request={api}
+            />
+          ) : null}
         </div>
       </main>
     </div>

@@ -5,6 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  BACKEND_URL = "https://portfolio-backend-vs7k.onrender.com"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

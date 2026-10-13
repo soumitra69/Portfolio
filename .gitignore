@@ -12,3 +12,6 @@ backend/data/
 artifacts/
 test-results/
 playwright-report/
+
+# Backend implementation and runtime data belong in the separate repository.
+/backend/

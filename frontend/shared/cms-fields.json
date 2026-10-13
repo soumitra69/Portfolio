@@ -1,0 +1,218 @@
+{
+  "navigation": {
+    "label": "Navigation",
+    "fields": [
+      ["name", "Name", "text", true, 60],
+      ["link", "Link / section", "link", true, 2000],
+      ["icon", "Icon classes", "icon", false, 80]
+    ]
+  },
+  "sections": {
+    "label": "Section order",
+    "fields": [
+      [
+        "key",
+        "Section",
+        "select",
+        true,
+        50,
+        [
+          "home",
+          "about",
+          "skills",
+          "services",
+          "experience",
+          "education",
+          "projects",
+          "gallery",
+          "contact"
+        ]
+      ],
+      ["heading", "Heading", "text", true, 150]
+    ]
+  },
+  "socialLinks": {
+    "label": "Social links",
+    "fields": [
+      ["name", "Name", "text", true, 60],
+      ["url", "URL", "link", true, 2000],
+      ["icon", "Icon classes", "icon", false, 80]
+    ]
+  },
+  "projects": {
+    "label": "Projects",
+    "fields": [
+      ["title", "Title", "text", true, 150],
+      ["description", "Description", "textarea", true, 2000],
+      ["image", "Image", "image", true, 2000],
+      ["technologies", "Technologies", "list", true, 500],
+      ["githubUrl", "GitHub URL", "url", true, 2000],
+      ["demoUrl", "Live demo URL", "url", true, 2000],
+      ["category", "Category", "text", false, 80],
+      ["featured", "Featured", "boolean"]
+    ]
+  },
+  "skills": {
+    "label": "Skills",
+    "fields": [
+      ["name", "Skill name", "text", true, 60],
+      ["category", "Category", "text", false, 80],
+      ["icon", "Icon classes", "icon", true, 80],
+      ["level", "Level (0–100)", "number", false, 100]
+    ]
+  },
+  "services": {
+    "label": "Services",
+    "fields": [
+      ["title", "Title", "text", true, 150],
+      ["shortDescription", "Short description", "textarea", true, 500],
+      ["description", "Detailed description", "textarea", false, 3000],
+      ["icon", "Icon classes", "icon", false, 80],
+      ["image", "Image", "image", false, 2000],
+      ["technologies", "Technologies", "list", false, 500],
+      ["features", "Features", "list", false, 1000],
+      ["price", "Price / pricing note", "text", false, 150],
+      ["ctaText", "CTA text", "text", false, 80],
+      ["ctaUrl", "CTA URL", "link", false, 2000]
+    ]
+  },
+  "experience": {
+    "label": "Experience",
+    "fields": [
+      ["company", "Company", "text", true, 120],
+      ["role", "Position", "text", true, 120],
+      [
+        "employmentType",
+        "Employment type",
+        "select",
+        true,
+        60,
+        [
+          "Internship",
+          "Full-time",
+          "Part-time",
+          "Contract",
+          "Freelance",
+          "Apprenticeship",
+          "Volunteer"
+        ]
+      ],
+      ["startDate", "Start date", "month", true, 10],
+      ["endDate", "End date", "month", false, 10],
+      ["current", "Current position", "boolean"],
+      ["description", "Description", "textarea", false, 2000],
+      ["technologies", "Technologies", "list", false, 500],
+      ["location", "Location", "text", false, 150],
+      ["companyUrl", "Company URL", "url", false, 2000]
+    ]
+  },
+  "education": {
+    "label": "Education",
+    "fields": [
+      ["institution", "Institution", "text", true, 150],
+      ["degree", "Degree", "text", true, 150],
+      ["course", "Course", "text", false, 150],
+      ["startYear", "Start year", "year", true, 2199],
+      ["endYear", "End year", "year", false, 2199],
+      ["description", "Description", "textarea", false, 2000],
+      ["location", "Location", "text", false, 150]
+    ]
+  },
+  "gallery": {
+    "label": "Gallery",
+    "fields": [
+      ["image", "Image", "image", true, 2000],
+      ["title", "Title / image alt text", "text", true, 150],
+      ["description", "Description", "textarea", false, 2000],
+      ["category", "Category", "text", false, 80],
+      ["featured", "Featured", "boolean"],
+      ["date", "Date", "date", false, 10],
+      ["externalUrl", "External URL", "url", false, 2000]
+    ]
+  },
+  "profile": {
+    "label": "Profile",
+    "singleton": true,
+    "fields": [
+      ["name", "Name", "text", true, 100],
+      ["title", "Professional title", "text", true, 150],
+      ["greeting", "Greeting", "text", true, 60],
+      ["shortIntroduction", "Short introduction", "textarea", true, 1000],
+      ["longIntroduction", "Long introduction", "textarea", false, 3000],
+      ["information", "Profile information", "textarea", false, 2000],
+      ["primaryCtaText", "Primary CTA text", "text", true, 80],
+      ["primaryCtaUrl", "Primary CTA URL", "link", true, 2000],
+      ["secondaryCtaText", "Secondary CTA text", "text", false, 80],
+      ["secondaryCtaUrl", "Secondary CTA URL", "link", false, 2000],
+      [
+        "backgroundVisual",
+        "Hero background",
+        "select",
+        true,
+        60,
+        ["orbital", "soft", "none"]
+      ]
+    ]
+  },
+  "about": {
+    "label": "About",
+    "singleton": true,
+    "fields": [
+      ["heading", "Heading", "text", true, 150],
+      ["shortIntroduction", "Short introduction", "textarea", true, 2000],
+      ["longDescription", "Long description", "textarea", false, 4000],
+      ["highlights", "Highlights (one per line)", "list", false, 1000],
+      [
+        "additionalInformation",
+        "Additional information",
+        "textarea",
+        false,
+        2000
+      ],
+      ["isVisible", "Visible publicly", "boolean"],
+      ["displayOrder", "Display order", "number", false, 10000]
+    ]
+  },
+  "contactInfo": {
+    "label": "Contact information",
+    "singleton": true,
+    "fields": [
+      ["heading", "Heading", "text", true, 150],
+      ["ctaText", "Work-together CTA text", "text", true, 100],
+      ["introduction", "Introduction", "textarea", true, 1500],
+      ["email", "Email", "email", false, 254],
+      ["emailVisible", "Show email", "boolean"],
+      ["mobile", "Mobile", "text", false, 60],
+      ["mobileVisible", "Show mobile", "boolean"],
+      ["location", "Location", "text", false, 150],
+      ["locationVisible", "Show location", "boolean"]
+    ]
+  },
+  "settings": {
+    "label": "Settings",
+    "singleton": true,
+    "fields": [
+      ["portfolioTitle", "Portfolio title", "text", true, 100],
+      ["siteDescription", "Site description", "textarea", true, 500],
+      ["seoTitle", "SEO title", "text", true, 150],
+      ["seoDescription", "SEO description", "textarea", true, 500],
+      ["canonicalUrl", "Canonical site URL", "url", false, 2000],
+      ["favicon", "Favicon image", "image", false, 2000],
+      [
+        "theme",
+        "Default theme",
+        "select",
+        true,
+        40,
+        ["light", "dark", "system"]
+      ],
+      ["primaryColor", "Brand primary color", "color", true, 7],
+      ["animationsEnabled", "Enable animations", "boolean"],
+      ["tiltEnabled", "Enable desktop 3D tilt", "boolean"],
+      ["contactFormEnabled", "Enable contact form", "boolean"],
+      ["inquiryEnabled", "Enable project inquiries", "boolean"],
+      ["footerText", "Footer text", "text", true, 150],
+      ["footerUrl", "Footer link", "url", false, 2000]
+    ]
+  }
+}

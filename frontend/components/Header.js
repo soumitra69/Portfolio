@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function Header() {
+export default function Header({
+  navigation,
+  brand = "Soumitra Samanta",
+  defaultTheme = "light",
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState("light");
   const [active, setActive] = useState("home");
@@ -12,29 +16,53 @@ export default function Header() {
   useEffect(() => {
     let savedTheme = "light";
     try {
-      savedTheme = localStorage.getItem("portfolio-theme") === "dark" ? "dark" : "light";
+      const saved = localStorage.getItem("portfolio-theme");
+      savedTheme =
+        saved ||
+        (defaultTheme === "system"
+          ? matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
+          : defaultTheme);
     } catch {
       // The toggle still works when browser storage is unavailable.
     }
     setTheme(savedTheme);
     document.documentElement.dataset.theme = savedTheme;
-  }, []);
+  }, [defaultTheme]);
 
   useEffect(() => {
     if (!window.IntersectionObserver) return;
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) if (entry.isIntersecting) setActive(entry.target.id);
-    }, { rootMargin: "-15% 0px -60% 0px", threshold: 0 });
-    document.querySelectorAll("main section[id]").forEach((section) => observer.observe(section));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries)
+          if (entry.isIntersecting) setActive(entry.target.id);
+      },
+      { rootMargin: "-15% 0px -60% 0px", threshold: 0 },
+    );
+    document
+      .querySelectorAll("main section[id]")
+      .forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, []);
+  }, [navigation]);
 
   useEffect(() => {
     if (!menuOpen) return;
-    const close = (event) => { if (event.key === "Escape") { setMenuOpen(false); menuButton.current?.focus(); } };
-    const outside = (event) => { if (!headerRef.current?.contains(event.target)) setMenuOpen(false); };
-    document.addEventListener("keydown", close); document.addEventListener("pointerdown", outside);
-    return () => { document.removeEventListener("keydown", close); document.removeEventListener("pointerdown", outside); };
+    const close = (event) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    const outside = (event) => {
+      if (!headerRef.current?.contains(event.target)) setMenuOpen(false);
+    };
+    document.addEventListener("keydown", close);
+    document.addEventListener("pointerdown", outside);
+    return () => {
+      document.removeEventListener("keydown", close);
+      document.removeEventListener("pointerdown", outside);
+    };
   }, [menuOpen]);
 
   function toggleTheme() {
@@ -51,28 +79,55 @@ export default function Header() {
   return (
     <header ref={headerRef}>
       <nav aria-label="Main navigation">
-        <a className="logo" href="#home" onClick={() => setMenuOpen(false)}>Soumitra Samanta</a>
+        <a className="logo" href="#home" onClick={() => setMenuOpen(false)}>
+          {brand}
+        </a>
         <ul id="nav-links" className={`nav-links${menuOpen ? " active" : ""}`}>
-          {["home", "about", "experience", "projects", "contact"].map((section) => (
-            <li key={section}>
-              <a href={`#${section}`} aria-current={active === section ? "location" : undefined} onClick={() => { setMenuOpen(false); setActive(section); }}>
-                {section[0].toUpperCase() + section.slice(1)}
+          {(navigation || []).map((item) => (
+            <li key={item.id}>
+              <a
+                href={item.link}
+                aria-current={
+                  active === item.link.slice(1) ? "location" : undefined
+                }
+                onClick={() => {
+                  setMenuOpen(false);
+                  setActive(item.link.slice(1));
+                }}
+              >
+                {item.icon && <i className={item.icon} aria-hidden="true" />}{" "}
+                {item.name}
               </a>
             </li>
           ))}
           <li>
-            <button type="button" className="theme-toggle" onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
-              <i className={`fas fa-${theme === "dark" ? "sun" : "moon"}`} aria-hidden="true" />
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            >
+              <i
+                className={`fas fa-${theme === "dark" ? "sun" : "moon"}`}
+                aria-hidden="true"
+              />
               <span>{theme === "dark" ? "Light" : "Dark"}</span>
             </button>
           </li>
         </ul>
-        <button ref={menuButton} type="button" className="mobile-menu-toggle"
+        <button
+          ref={menuButton}
+          type="button"
+          className="mobile-menu-toggle"
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-          aria-expanded={menuOpen} aria-controls="nav-links"
-          onClick={() => setMenuOpen(!menuOpen)}>
-          <i className={`fas fa-${menuOpen ? "times" : "bars"}`} aria-hidden="true" />
+          aria-expanded={menuOpen}
+          aria-controls="nav-links"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <i
+            className={`fas fa-${menuOpen ? "times" : "bars"}`}
+            aria-hidden="true"
+          />
         </button>
       </nav>
     </header>

@@ -1,170 +1,106 @@
-﻿# Soumitra Samanta's Portfolio
+# Soumitra Samanta's Portfolio
 
-The original portfolio converted to a Next.js App Router frontend and separate Node.js/Express backend, with an admin panel at `/admin`.
+The existing React/Next.js portfolio and Admin CMS frontend. This repository contains the frontend and its API integration only.
+
+- Frontend repository: https://github.com/soumitra69/Portfolio
+- Backend repository: https://github.com/soumitra69/Portfolio-backend
+
+The backend is maintained and deployed independently. Do not copy its implementation, environment file, database data or dependencies into this repository.
+
+## Preserved features
+
+Original branding, blue/amber colors, images, About content, project links and original section order are preserved. The portfolio includes selective CSS 3D profile/card effects, responsive layouts, reduced-motion support, dark/light theme and accessible mobile navigation.
+
+All portfolio content is managed through /admin: profile, navigation, About, independently visible contact details, social links, services, projects, skills, experience, education, gallery, section order, theme, animations, SEO and footer. Collections support add/edit/delete/hide/show/activate/reorder. Gallery supports validated admin uploads, filters and a keyboard-accessible lightbox. Empty career/education/gallery sections never invent records.
+
+The existing Contact section supports messages and project inquiries with validation/loading/success/error states. The admin dashboard includes totals, recent items, quick actions, inbox details, read/unread, inquiry statuses, email delivery state and optional aggregate visitor statistics. Email is disabled until the owner configures SMTP in the backend.
 
 ## Run locally
 
-Use Node.js 22.9 or newer and npm. From the `Portfolio` folder:
+Use Node.js 22.9 or newer. Clone the two repositories beside each other:
 
-```bash
-npm install
-npm run setup:admin
-npm run dev
-```
+    Projects/
+      Portfolio/          # This frontend repository
+      Portfolio-backend/  # Separate backend repository and private runtime files
 
-- Portfolio: http://localhost:3000
-- Admin panel: http://localhost:3000/admin
-- Backend health: http://localhost:5000/api/health
+First, in Portfolio-backend:
 
-`npm run dev` starts both the frontend and backend, whether you run it from `Portfolio/` or `Portfolio/frontend/`. If a healthy backend is already running, it reuses it. The admin login needs both servers. Use `npm run dev:web --workspace frontend` only when running the backend separately.
+    yarn install --frozen-lockfile
+    # Copy .env.example to .env and configure your existing MongoDB connection and JWT key.
+    yarn start
 
-Your existing MongoDB login is `admin@gmail.com` / `Admin` (capital A). `setup:admin` preserves existing accounts and connection settings, and writes only a password hash and private JWT key locally. For a new account, supply `ADMIN_USERNAME` and `ADMIN_PASSWORD` privately; the setup removes the plaintext provisioning password from the local environment file afterward. Admin sessions last eight hours; a stable JWT key preserves them across restarts. Signing out revokes all owner sessions.
+Then, in Portfolio:
 
-## Features
+    npm ci
+    npm run dev
 
-- Original portfolio sections, images, project links, responsive layout, and animations.
-- Dark/light theme with a saved preference and accessible mobile navigation.
-- Contact form with validation, submission feedback, and persistent message storage.
-- Subject field and a project-inquiry choice in the existing Contact form; the existing “Let's work together!” heading opens that choice.
-- Protected inquiry management, submission details, email delivery status, and optional visitor statistics in the existing admin panel.
-- Protected admin dashboard with message counts, read/unread controls, email reply links, and deletion.
-- Add, edit, or delete projects. The public portfolio loads updated projects on each visit.
-- Manage skills through the admin panel's Skills tab. Add a name and select an icon; add, edit, and delete changes appear in the portfolio's About section on each visit.
-- Manage Experience with company, job title, employment type, joining month, end month or Present, and an optional description. Entries appear in the public Experience section, newest first.
-- Change your profile photo in the Profile tab. Preview and upload JPEG, PNG, or WebP images up to 10 MB, or restore the original photo.
+The frontend starts at http://localhost:3000 and the admin panel is http://localhost:3000/admin. The separate backend defaults to http://127.0.0.1:5000. Frontend development does not start or modify the backend repository. Sign in using your existing database account; the integration preserves it.
 
-Contact messages and inquiries use MongoDB when configured. Optional SMTP notifications go to the owner; reply links open your email application. Profile photo uploads are validated, rotated, cropped, and saved as JPEG images in `backend/data/uploads/`, then served through `/api/media/`. Back up this folder alongside the database. Add new project images to `frontend/public/assets/` and enter their `/assets/filename.png` path in the admin form; project image uploads are not included.
+For another API origin, copy frontend/.env.local.example to frontend/.env.local and set:
 
-## Structure
+    BACKEND_URL=http://127.0.0.1:5000
+    ANALYTICS_ENABLED=false
 
-```text
-Portfolio/
-  frontend/
-    app/                 # Next.js pages, metadata, and portfolio CSS
-      admin/page.js      # Admin page
-    components/          # Navigation, contact form, projects, admin panel
-    public/assets/       # Original portfolio images
-    next.config.mjs      # Proxy /api requests to the backend
-    shared/              # Frontend fallback data and presentation utilities
-  backend/
-    src/                 # Express API, authentication, JSON storage
-    shared/              # Backend seed data and utilities for standalone deployment
-    scripts/             # Local admin credential setup
-    test/                # API integration tests
-    data/portfolio.json  # Created when data is saved; excluded from Git
-    data/uploads/        # Uploaded profile photos; excluded from Git
-  scripts/dev.mjs        # Starts both development servers
-  package.json           # npm workspaces and shared commands
-  package-lock.json      # Shared dependency lockfile
-  netlify.toml           # Netlify frontend build configuration
-```
+BACKEND_URL is a server-side HTTP(S) origin, without /api, a query, fragment or credentials. The Next.js /api proxy and server-rendered content use the same validated origin. Browser requests stay same-origin, and HttpOnly admin cookies pass through the proxy. Restart/rebuild after changing the API origin. Development defaults to localhost:5000; production defaults to https://portfolio-backend-vs7k.onrender.com.
 
-## Configuration
+Never put MongoDB credentials, JWT keys, SMTP passwords or storage secrets in this repository or NEXT_PUBLIC variables. They belong in the separate backend's ignored .env or hosting environment.
 
-Copy `frontend/.env.local.example` to `frontend/.env.local` to use the hosted backend at `https://portfolio-backend-vs7k.onrender.com`. Next.js uses `BACKEND_URL` for its server proxy; restart/rebuild after changing it. Without an override, development uses `http://127.0.0.1:5000` and production uses the Render URL. Set `BACKEND_URL=http://127.0.0.1:5000` when using the local backend instead.
+## API contract
 
-The backend reads `backend/.env`:
+Public content uses GET /api/content, with visible/active records and ordered sections. Individual reads include /api/profile, /navigation, /about, /contact, /services, /projects, /skills, /experience, /education, /gallery and /settings. Contacts submit to POST /api/messages; project inquiries submit to POST /api/inquiries.
 
-```dotenv
-PORT=5000
-ADMIN_USERNAME=admin@gmail.com
-ADMIN_PASSWORD_HASH=<generated-by-setup-admin>
-JWT_SECRET=<random-private-key-at-least-32-characters>
-# Optional: DATA_FILE=/absolute/path/to/portfolio.json
-```
+Authentication uses POST /api/admin/login, GET /api/admin/session and POST /api/admin/logout. CMS, inbox, analytics and upload routes under /api/admin require the server-issued HttpOnly JWT cookie. Admin mutations include X-Admin-Request: 1. All sensitive configuration stays on the backend. See the backend repository's README for the full endpoint and deployment contract.
 
-Without MongoDB configured, data persists in `backend/data/portfolio.json`. Writes are serialized and saved atomically within a single process. Use persistent storage for hosting and back up this file. Admin endpoints require an HttpOnly session cookie and custom request header, supplied by the dashboard. Login and contact submissions have rate limits.
+The public page refreshes on focus, every 30 seconds while visible, and through same-browser admin broadcasts. Initial API failures show a retry view; later refresh failures preserve the last successful content. Metadata is server-rendered from current CMS settings.
 
-### MongoDB Atlas
+## Checks
 
-Set these server-only variables in the ignored `backend/.env` file:
+    npm run check:api
+    npm run build
+    npm run test:e2e
 
-```dotenv
-MONGODB_URI=mongodb+srv://<database-user>:<encoded-password>@portfolio.squb9eq.mongodb.net/?appName=Portfolio
-MONGODB_DB=portfolio
-```
+check:api verifies health, the CMS contract and rejection of anonymous admin access. It reads BACKEND_URL from frontend/.env.local or the process environment. A missing /api/content means the backend must be updated; changing the frontend URL cannot add missing server routes.
 
-Run `npm run check:db --workspace backend` to verify the connection, then
-`npm run dev` to start the portfolio. The backend imports existing local data
-or seed defaults into MongoDB on its first start, preserving any data already
-in the database. Projects, skills, experience, profile metadata, and contact
-messages use MongoDB; profile image files still need persistent upload storage.
-Atlas Network Access must allow the backend's IP address.
+Browser tests launch an isolated API fixture from the sibling Portfolio-backend checkout, not an embedded backend folder, and never write to your live MongoDB portfolio. Install that repository's dependencies first. For another checkout location, set BACKEND_REPO_PATH to its absolute path before testing. Backend unit/API/MongoDB tests live in the backend repository.
 
-MongoDB admin login uses the database's `admins` collection. To create the first
-account, set your chosen `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `backend/.env`
-and run `npm run setup:admin:db --workspace backend`. Existing accounts are preserved.
+For production-mode browser tests in PowerShell:
 
-For the hosted portfolio, also set `MONGODB_URI` and `MONGODB_DB` in the Render
-backend service environment and restart the service. Local `.env` settings do
-not configure Render. Never put the URI in frontend code or `NEXT_PUBLIC_*`
-variables. See [backend setup](backend/README.md) for deployment details.
+    $env:BACKEND_URL='http://127.0.0.1:5055'
+    $env:ANALYTICS_ENABLED='true'
+    npm run build
+    $env:E2E_PRODUCTION='true'
+    npm run test:e2e
 
-Supabase Storage credentials belong in the ignored `backend/.env` file:
+Rebuild with the deployment API origin afterward. Test fixtures use test-only credentials, not your owner login. API and browser checks cover CMS CRUD/visibility/reorder, contact and inquiry flows, protected login, image uploads, gallery controls, reduced motion and mobile layouts.
 
-```dotenv
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_PUBLISHABLE_KEY=your-publishable-key
-SUPABASE_SECRET_KEY=your-server-only-secret-key
-SUPABASE_STORAGE_BUCKET=your-bucket-name
-```
+## Deployment
 
-Keep the secret key on the backend; do not place it in `frontend/` or a `NEXT_PUBLIC_*` variable. The project URL and bucket name are required before connecting Supabase Storage. Profile photo uploads currently use local storage; portfolio content uses MongoDB when configured and JSON for local development otherwise.
+Deploy the separate backend first, then deploy this frontend. Keep the backend's existing MongoDB data and admin account. Backend production requires NODE_ENV=production, MONGODB_URI, MONGODB_DB, JWT_SECRET (32+ characters), CORS_ORIGINS and the correct trusted proxy setting. CORS_ORIGINS must include the exact frontend origin. Use persistent disk or configured Supabase Storage for uploaded images. SMTP remains optional.
 
-## Build and checks
-
-```bash
-npm test
-npm run build
-npm start
-```
-
-`npm start` runs both servers after building the frontend. For HTTPS hosting, set `NODE_ENV=production` in the backend environment to enable secure cookies. Keep backend access behind the Next.js proxy and use HTTPS for the public site. Credentials and saved messages are excluded from Git.
-
-API routes include `GET /api/health`, `GET /api/projects`, `GET /api/skills`, `GET /api/experience`, `GET /api/profile`, `POST /api/contact`, and protected `/api/admin/*` routes for login, sessions, messages, projects, skills, experience, and profile photo uploads. The frontend falls back to initial projects, skills, and the original photo if the API is unavailable; contact submission and admin management require the backend.
-
-Customize static hero/about/skills/contact content in `frontend/app/page.js`, styling in `frontend/app/globals.css`, and initial projects in `frontend/shared/projects.json`. Once projects have been saved to the data file, use the admin panel to change them.
-
-## GitHub and Netlify production builds
-
-Use `Portfolio/` as the single Git repository root. The frontend, backend, shared data, root package files, and development scripts all belong to this repository. Do not initialize separate Git repositories inside `frontend/` or `backend/`. The former nested repositories' Git metadata was preserved locally under `.git/repository-backups/`; it is not published.
-
-The frontend owns `frontend/shared/`, and the backend owns `backend/shared/`, so each app's imports stay inside its deployable directory. The backend imports its seed data through `../shared/` from `src/`; it can start without the frontend folder. Both directories include the six required files: `employment-types.json`, `format-month.js`, `profile.json`, `projects.json`, `skills.json`, and `skill-icons.json`. Existing saved backend data still takes precedence over its seed defaults.
-
-Install and build from either the repository root or the frontend:
-
-```bash
-# From Portfolio/
-npm install
-npm run build
-
-# Or from Portfolio/frontend/
-npm install
-npm run build
-```
-
-Keep the root `package-lock.json` in Git. npm workspaces install Next.js, React, and React DOM declared in `frontend/package.json`; `next.config.mjs` explicitly sets the workspace resolution and file tracing root. A standalone copy of `frontend/` uses its own build root when the workspace lockfile is absent.
-
-For Netlify, connect the GitHub repository containing the entire `Portfolio/` project and set:
+Netlify configuration is in netlify.toml:
 
 | Setting | Value |
 | --- | --- |
-| Base directory | Repository root (`.`); configured in `netlify.toml` |
-| Package directory | `frontend` (set this in the Netlify UI) |
-| Build command | `npm run build --workspace frontend` |
-| Publish directory | `frontend/.next` |
-| Node version | `22` |
+| Repository | soumitra69/Portfolio |
+| Base directory | Repository root |
+| Package directory | frontend |
+| Build command | npm run build --workspace frontend |
+| Publish directory | frontend/.next |
+| Node version | 22 |
+| BACKEND_URL | https://portfolio-backend-vs7k.onrender.com |
 
-The configuration enables Netlify's Next.js adapter. Keep the Next.js server build; do not change this app to a static export, because its API proxy and admin features require server support.
+The Next.js server adapter is required for server rendering and the /api proxy. Do not convert the app to static export. Run check:api against the hosted backend before deploying the matching frontend. Render configuration and private credentials belong to Portfolio-backend, not Netlify.
 
-Netlify hosts the frontend. The production API proxy defaults to `https://portfolio-backend-vs7k.onrender.com`; you can also set `BACKEND_URL` in Netlify's environment settings to that origin before building. The local development default is `http://127.0.0.1:5000`. Deploy the Express backend separately with persistent storage. Set backend credentials and other secrets on the backend host; do not put them in the frontend or Git.
+## Structure
 
-`.env`, `.env.local`, other local environment files, `node_modules/`, `.next/`, `.netlify/`, and backend data/uploads are ignored. Only `.env*.example` templates belong in Git; never put actual secrets in them.
+    frontend/app/          # Public and /admin pages, metadata, CSS
+    frontend/components/   # Existing UI and reusable CMS editors
+    frontend/services/     # Server-only API origin/content integration
+    frontend/shared/       # Presentation utilities and CMS field descriptors
+    frontend/public/       # Original portfolio assets
+    scripts/               # Frontend development and read-only API check
+    tests/e2e/             # Browser integration tests
+    package-lock.json      # Frontend workspace dependencies only
+    netlify.toml           # Frontend deployment
 
-Run the publishing commands from `Portfolio/`:
-
-```bash
-git add .
-git commit -m "Fix production build"
-git push
-```
+Environment files, node_modules, build outputs, test artifacts and logs are ignored. No backend folder belongs in this repository. Backend history and runtime data are maintained in the separate repository. Normal portfolio content edits require no frontend source changes.

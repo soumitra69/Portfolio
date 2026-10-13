@@ -3,22 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "frontend",
-    "backend"
+    "frontend"
   ],
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "npm run build --workspace frontend",
-    "start": "concurrently --kill-others -n frontend,backend \"npm run start --workspace frontend\" \"npm run start --workspace backend\"",
-    "test": "npm run test --workspace backend",
+    "start": "npm run start --workspace frontend",
+    "test": "npm run test:e2e",
     "test:e2e": "playwright test",
-    "setup:admin": "node backend/scripts/setup-admin.js"
+    "check:api": "node scripts/check-api.mjs"
   },
   "engines": {
     "node": ">=22.9.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.0",
-    "concurrently": "^9.0.0"
+    "@playwright/test": "^1.64.0"
   }
 }

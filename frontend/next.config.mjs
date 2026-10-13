@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { getBackendURL } from "./services/backend-url.mjs";
 import { fileURLToPath } from "node:url";
 
 // npm workspaces hoist Next.js into the repository's node_modules.
@@ -7,10 +8,7 @@ const buildRoot = fileURLToPath(new URL(
   existsSync(new URL("../package-lock.json", import.meta.url)) ? "../" : "./",
   import.meta.url,
 ));
-const defaultBackendUrl = process.env.NODE_ENV === "production"
-  ? "https://portfolio-backend-vs7k.onrender.com"
-  : "http://127.0.0.1:5000";
-const backendUrl = (process.env.BACKEND_URL || defaultBackendUrl).replace(/\/$/, "");
+const backendUrl = getBackendURL();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
