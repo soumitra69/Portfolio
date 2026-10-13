@@ -18,20 +18,22 @@ npm run dev
 
 `npm run dev` starts both the frontend and backend, whether you run it from `Portfolio/` or `Portfolio/frontend/`. If a healthy backend is already running, it reuses it. The admin login needs both servers. Use `npm run dev:web --workspace frontend` only when running the backend separately.
 
-`setup:admin` sets the login to username `admin@gmail.com` and password `admin` in `backend/.env`. The credentials persist across restarts. Running setup again restores the same login while preserving other environment settings, including Supabase credentials. Restart the backend after changing credentials. Admin sessions last eight hours; restarting the backend signs out existing sessions.
+Your existing MongoDB login is `admin@gmail.com` / `Admin` (capital A). `setup:admin` preserves existing accounts and connection settings, and writes only a password hash and private JWT key locally. For a new account, supply `ADMIN_USERNAME` and `ADMIN_PASSWORD` privately; the setup removes the plaintext provisioning password from the local environment file afterward. Admin sessions last eight hours; a stable JWT key preserves them across restarts. Signing out revokes all owner sessions.
 
 ## Features
 
 - Original portfolio sections, images, project links, responsive layout, and animations.
 - Dark/light theme with a saved preference and accessible mobile navigation.
 - Contact form with validation, submission feedback, and persistent message storage.
+- Subject field and a project-inquiry choice in the existing Contact form; the existing “Let's work together!” heading opens that choice.
+- Protected inquiry management, submission details, email delivery status, and optional visitor statistics in the existing admin panel.
 - Protected admin dashboard with message counts, read/unread controls, email reply links, and deletion.
 - Add, edit, or delete projects. The public portfolio loads updated projects on each visit.
 - Manage skills through the admin panel's Skills tab. Add a name and select an icon; add, edit, and delete changes appear in the portfolio's About section on each visit.
 - Manage Experience with company, job title, employment type, joining month, end month or Present, and an optional description. Entries appear in the public Experience section, newest first.
 - Change your profile photo in the Profile tab. Preview and upload JPEG, PNG, or WebP images up to 10 MB, or restore the original photo.
 
-Contact messages are stored locally; they are not automatically emailed. Reply links open your email application. Profile photo uploads are validated, rotated, cropped, and saved as JPEG images in `backend/data/uploads/`, then served through `/api/media/`. Back up this folder alongside the JSON data file. Add new project images to `frontend/public/assets/` and enter their `/assets/filename.png` path in the admin form; project image uploads are not included.
+Contact messages and inquiries use MongoDB when configured. Optional SMTP notifications go to the owner; reply links open your email application. Profile photo uploads are validated, rotated, cropped, and saved as JPEG images in `backend/data/uploads/`, then served through `/api/media/`. Back up this folder alongside the database. Add new project images to `frontend/public/assets/` and enter their `/assets/filename.png` path in the admin form; project image uploads are not included.
 
 ## Structure
 
@@ -66,7 +68,8 @@ The backend reads `backend/.env`:
 ```dotenv
 PORT=5000
 ADMIN_USERNAME=admin@gmail.com
-ADMIN_PASSWORD=admin
+ADMIN_PASSWORD_HASH=<generated-by-setup-admin>
+JWT_SECRET=<random-private-key-at-least-32-characters>
 # Optional: DATA_FILE=/absolute/path/to/portfolio.json
 ```
 
@@ -106,7 +109,7 @@ SUPABASE_SECRET_KEY=your-server-only-secret-key
 SUPABASE_STORAGE_BUCKET=your-bucket-name
 ```
 
-Keep the secret key on the backend; do not place it in `frontend/` or a `NEXT_PUBLIC_*` variable. The project URL and bucket name are required before connecting Supabase Storage. Profile photo uploads currently use local storage, and portfolio content uses the JSON data file.
+Keep the secret key on the backend; do not place it in `frontend/` or a `NEXT_PUBLIC_*` variable. The project URL and bucket name are required before connecting Supabase Storage. Profile photo uploads currently use local storage; portfolio content uses MongoDB when configured and JSON for local development otherwise.
 
 ## Build and checks
 

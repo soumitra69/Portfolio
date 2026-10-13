@@ -17,7 +17,10 @@ try {
   backendRunning = response.ok && (await response.json()).status === "ok";
 } catch { /* Start the backend when no healthy instance is available. */ }
 
-const commands = [{ command: "npm run dev:web --workspace frontend", name: "frontend" }];
+const commands = [{ command: "npm run dev:web --workspace frontend", name: "frontend", env: {
+  BACKEND_URL: process.env.BACKEND_URL || `http://127.0.0.1:${backendPort}`,
+  ANALYTICS_ENABLED: process.env.ANALYTICS_ENABLED || backendSettings.ANALYTICS_ENABLED || "false",
+} }];
 if (backendRunning) console.log(`Using the running portfolio backend on port ${backendPort}.`);
 else commands.push({ command: "npm run dev --workspace backend", name: "backend" });
 const { result } = concurrently(commands, { cwd: root, killOthersOn: ["success", "failure"] });

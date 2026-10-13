@@ -7,12 +7,14 @@ import initialSkills from "../shared/skills.json";
 import Header from "../components/Header";
 import ContactForm from "../components/ContactForm";
 import SectionAnimations from "../components/SectionAnimations";
+import VisitorAnalytics from "../components/VisitorAnalytics";
 
 export default function Home() {
   return (
     <>
       <Header />
-      <main>
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <main id="main-content">
     
     <section id="home" className="hero">
         <div className="hero-content">
@@ -75,13 +77,13 @@ export default function Home() {
             <h2 className="section-title">Get In Touch</h2>
             <div className="contact-content">
                 <div className="contact-info">
-                    <h3>Let's work together!</h3>
+                    <h3><a href="#contact-form" data-contact-mode="inquiry">Let's work together!</a></h3>
                     <p>I'm always interested in new opportunities and interesting projects. Whether you have a question
                         or just want to say hi, feel free to reach out!</p>
 
                     <div className="contact-item">
                         <i aria-hidden="true" className="fas fa-envelope"></i>
-                        <span>soumitrasamanta69@gmail.com</span>
+                        <a href="mailto:soumitrasamanta69@gmail.com">soumitrasamanta69@gmail.com</a>
                     </div>
                     <div className="contact-item">
                         <i aria-hidden="true" className="fas fa-phone"></i>
@@ -118,6 +120,7 @@ export default function Home() {
 
 
       <SectionAnimations />
+      <VisitorAnalytics enabled={process.env.ANALYTICS_ENABLED === "true"} />
     </>
   );
 }

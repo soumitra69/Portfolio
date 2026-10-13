@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { connectDatabase } from "../config/database.js";
 import { createAdminAccounts } from "../src/admin-accounts.js";
 
 let client;
@@ -6,11 +6,8 @@ try {
   if (!process.env.MONGODB_URI || !process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
     throw new Error("Set MONGODB_URI, ADMIN_USERNAME and ADMIN_PASSWORD privately before running database setup.");
   }
-  client = new MongoClient(process.env.MONGODB_URI, {
-    serverSelectionTimeoutMS: 10000, connectTimeoutMS: 10000,
-  });
-  await client.connect();
-  const collection = client.db(process.env.MONGODB_DB || "portfolio").collection("admins");
+  client = await connectDatabase();
+  const collection = client.db.collection("admins");
   const created = await createAdminAccounts(collection).provision(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
   console.log(created
     ? "Admin account created in MongoDB with a password hash. No credentials were saved to a local data file."

@@ -9,3 +9,6 @@ coverage/
 backend/data/
 *.log
 .netlify/
+artifacts/
+test-results/
+playwright-report/

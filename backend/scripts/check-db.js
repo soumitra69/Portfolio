@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { connectDatabase } from "../config/database.js";
 
 if (!process.env.MONGODB_URI) {
   console.error("Set MONGODB_URI in the backend environment before checking MongoDB.");
@@ -7,11 +7,8 @@ if (!process.env.MONGODB_URI) {
 
 let client;
 try {
-  client = new MongoClient(process.env.MONGODB_URI, {
-    serverSelectionTimeoutMS: 10000, connectTimeoutMS: 10000,
-  });
-  await client.connect();
-  await client.db(process.env.MONGODB_DB || "portfolio").command({ ping: 1 });
+  client = await connectDatabase();
+  await client.db.command({ ping: 1 });
   console.log("MongoDB connection verified.");
 } catch (error) {
   const authenticationFailed = error.code === 18 || /authentication|bad auth/i.test(error.message);

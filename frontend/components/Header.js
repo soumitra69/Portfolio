@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [active, setActive] = useState("home");
+  const headerRef = useRef(null);
+  const menuButton = useRef(null);
 
   useEffect(() => {
     let savedTheme = "light";
@@ -16,6 +19,23 @@ export default function Header() {
     setTheme(savedTheme);
     document.documentElement.dataset.theme = savedTheme;
   }, []);
+
+  useEffect(() => {
+    if (!window.IntersectionObserver) return;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) if (entry.isIntersecting) setActive(entry.target.id);
+    }, { rootMargin: "-15% 0px -60% 0px", threshold: 0 });
+    document.querySelectorAll("main section[id]").forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event) => { if (event.key === "Escape") { setMenuOpen(false); menuButton.current?.focus(); } };
+    const outside = (event) => { if (!headerRef.current?.contains(event.target)) setMenuOpen(false); };
+    document.addEventListener("keydown", close); document.addEventListener("pointerdown", outside);
+    return () => { document.removeEventListener("keydown", close); document.removeEventListener("pointerdown", outside); };
+  }, [menuOpen]);
 
   function toggleTheme() {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -29,13 +49,13 @@ export default function Header() {
   }
 
   return (
-    <header>
+    <header ref={headerRef}>
       <nav aria-label="Main navigation">
-        <div className="logo">Soumitra Samanta</div>
+        <a className="logo" href="#home" onClick={() => setMenuOpen(false)}>Soumitra Samanta</a>
         <ul id="nav-links" className={`nav-links${menuOpen ? " active" : ""}`}>
           {["home", "about", "experience", "projects", "contact"].map((section) => (
             <li key={section}>
-              <a href={`#${section}`} onClick={() => setMenuOpen(false)}>
+              <a href={`#${section}`} aria-current={active === section ? "location" : undefined} onClick={() => { setMenuOpen(false); setActive(section); }}>
                 {section[0].toUpperCase() + section.slice(1)}
               </a>
             </li>
@@ -48,7 +68,7 @@ export default function Header() {
             </button>
           </li>
         </ul>
-        <button type="button" className="mobile-menu-toggle"
+        <button ref={menuButton} type="button" className="mobile-menu-toggle"
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={menuOpen} aria-controls="nav-links"
           onClick={() => setMenuOpen(!menuOpen)}>

@@ -6,6 +6,8 @@ import SkillManager from "./SkillManager";
 import ExperienceManager from "./ExperienceManager";
 import ProfileManager from "./ProfileManager";
 import defaultProfile from "../shared/profile.json";
+import SubmissionInbox from "./SubmissionInbox";
+import VisitorStatistics from "./VisitorStatistics";
 import "./admin.css";
 
 const emptyProject = { title: "", description: "", image: "", demoUrl: "", githubUrl: "", technologies: "" };
@@ -36,6 +38,10 @@ export default function AdminPanel() {
   const [session, setSession] = useState(null);
   const [checking, setChecking] = useState(true);
   const [messages, setMessages] = useState([]);
+  const [inquiries, setInquiries] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+  const [overview, setOverview] = useState({ messages: 0, unread: 0, inquiries: 0, newInquiries: 0 });
+  const [notifications, setNotifications] = useState({ configured: false });
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [experience, setExperience] = useState([]);
@@ -59,6 +65,8 @@ export default function AdminPanel() {
     setSkills(skillList);
     setExperience(history);
     setProfile(personal);
+    const [inquiryList, visits, summary, mail] = await Promise.all([api("/admin/inquiries"), api("/admin/analytics"), api("/admin/overview"), api("/admin/notifications/status")]);
+    setInquiries(inquiryList); setAnalytics(visits); setOverview(summary); setNotifications(mail);
   }, []);
 
   useEffect(() => {
@@ -138,6 +146,8 @@ export default function AdminPanel() {
         <p className="admin-sidebar-label">WORKSPACE</p>
         <div className="admin-tabs" role="tablist" aria-label="Admin sections">
           <button id="messages-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "messages"} onClick={() => setTab("messages")}><i className="fas fa-envelope" aria-hidden="true" /> Messages <span>{messages.filter((item) => !item.read).length}</span></button>
+            <button id="inquiries-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "inquiries"} onClick={() => setTab("inquiries")}><i className="fas fa-handshake" aria-hidden="true" /> Inquiries <span>{overview.newInquiries}</span></button>
+            <button id="analytics-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "analytics"} onClick={() => setTab("analytics")}><i className="fas fa-chart-bar" aria-hidden="true" /> Visitors</button>
           <button id="projects-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "projects"} onClick={() => setTab("projects")}><i className="fas fa-code" aria-hidden="true" /> Projects</button>
           <button id="skills-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "skills"} onClick={() => setTab("skills")}><i className="fas fa-layer-group" aria-hidden="true" /> Skills</button>
           <button id="experience-tab" role="tab" aria-controls="admin-content" aria-selected={tab === "experience"} onClick={() => setTab("experience")}><i className="fas fa-briefcase" aria-hidden="true" /> Experience</button>
@@ -151,28 +161,19 @@ export default function AdminPanel() {
           <div className="admin-account"><span>{session.username}</span><button disabled={busy} onClick={() => run(async () => { await api("/admin/logout", { method: "POST" }); setSession(null); setMessages([]); setProjects([]); })}>Sign out</button></div>
         </div>
         <div className="admin-stats">
-          <div><span>Total messages</span><strong>{messages.length}</strong></div>
-          <div><span>Unread messages</span><strong>{messages.filter((item) => !item.read).length}</strong></div>
+          <div><span>Total messages</span><strong>{overview.messages}</strong></div>
+          <div><span>Unread messages</span><strong>{overview.unread}</strong></div>
+          <div><span>Project inquiries</span><strong>{overview.inquiries}</strong></div>
           <div><span>Portfolio projects</span><strong>{projects.length}</strong></div>
         </div>
         {noticeView}
-        <div className="admin-section-heading"><h2>{{ messages: "Contact messages", projects: "Manage projects", skills: "Manage skills", experience: "Manage experience", profile: "Profile photo" }[tab]}</h2><button disabled={busy} onClick={() => run(refresh, "Dashboard refreshed.")}>{busy ? "Working…" : "Refresh"}</button></div>
+        {!notifications.configured && <p className="admin-configuration-note">Submissions are saved. Email notifications will start once SMTP is configured on the backend.</p>}
+        <div className="admin-section-heading"><h2>{{ messages: "Contact messages", inquiries: "Project inquiries", analytics: "Visitor statistics", projects: "Manage projects", skills: "Manage skills", experience: "Manage experience", profile: "Profile photo" }[tab]}</h2><button disabled={busy} onClick={() => run(refresh, "Dashboard refreshed.")}>{busy ? "Working…" : "Refresh"}</button></div>
         <div id="admin-content" role="tabpanel" aria-labelledby={`${tab}-tab`}>
-          {tab === "messages" ? (
-            <div className="admin-message-list">
-              {!messages.length && <div className="admin-empty"><i className="far fa-envelope" aria-hidden="true" /><h3>Your inbox is clear</h3><p>Messages submitted through your portfolio will appear here.</p></div>}
-              {messages.map((message) => (
-                <article className={`admin-message${message.read ? "" : " unread"}`} key={message.id}>
-                  <div className="admin-message-heading"><div><h3>{message.name} {!message.read && <span className="admin-badge">New</span>}</h3><a href={`mailto:${message.email}`}>{message.email}</a></div><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString()}</time></div>
-                  <p className="admin-message-body">{message.message}</p>
-                  <div className="admin-actions">
-                    <button disabled={busy} onClick={() => run(async () => { await api(`/admin/messages/${message.id}`, { method: "PATCH", body: JSON.stringify({ read: !message.read }) }); await refresh(); })}>Mark as {message.read ? "unread" : "read"}</button>
-                    <a href={`mailto:${message.email}`}>Reply by email</a>
-                    <button className="admin-danger" disabled={busy} onClick={() => { if (window.confirm("Delete this message permanently?")) run(async () => { await api(`/admin/messages/${message.id}`, { method: "DELETE" }); await refresh(); }, "Message deleted."); }}>Delete</button>
-                  </div>
-                </article>
-              ))}
-            </div>
+          {tab === "messages" || tab === "inquiries" ? (
+            <SubmissionInbox key={tab} kind={tab === "messages" ? "contact" : "inquiry"} records={tab === "messages" ? messages : inquiries} busy={busy} run={run} refresh={refresh} request={api} />
+          ) : tab === "analytics" ? (
+            <VisitorStatistics analytics={analytics} />
           ) : tab === "skills" ? (
             <SkillManager skills={skills} busy={busy} run={run} refresh={refresh} request={api} />
           ) : tab === "experience" ? (

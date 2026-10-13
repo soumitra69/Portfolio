@@ -5,12 +5,12 @@ import { fileURLToPath } from "node:url";
 import seedProjects from "../shared/projects.json" with { type: "json" };
 import seedSkills from "../shared/skills.json" with { type: "json" };
 import defaultProfile from "../shared/profile.json" with { type: "json" };
-import { createMongoStore } from "./mongo-store.js";
+import { createMongooseStore } from "../config/mongoose-store.js";
 
 export function createStore(filename) {
   const local = createFileStore(filename);
   if (filename === undefined && process.env.MONGODB_URI) {
-    return createMongoStore(process.env.MONGODB_URI, { loadInitialData: local.read });
+    return createMongooseStore(process.env.MONGODB_URI, { loadInitialData: local.read });
   }
   return local;
 }
@@ -42,5 +42,10 @@ export function createFileStore(filename = process.env.DATA_FILE || fileURLToPat
     return task;
   }
 
-  return { read: () => queue.then(read), update, close: async () => { await queue; } };
+  return {
+    read: () => queue.then(read), update,
+    getAdminAuthVersion: async () => (await queue.then(read)).adminTokenVersion || 0,
+    revokeAdminSessions: () => update((data) => { data.adminTokenVersion = (data.adminTokenVersion || 0) + 1; }),
+    close: async () => { await queue; },
+  };
 }

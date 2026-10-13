@@ -29,7 +29,7 @@ export function createAdminAccounts(collection) {
         throw new Error("Set valid ADMIN_USERNAME and ADMIN_PASSWORD for the one-time database setup.");
       }
       if (await collection.findOne({ _id: "owner" })) return false;
-      const account = { username, passwordHash: await hashPassword(password), createdAt: new Date() };
+      const account = { name: process.env.ADMIN_NAME || "Portfolio owner", email: username, username, passwordHash: await hashPassword(password), role: "admin", tokenVersion: 0, createdAt: new Date() };
       try {
         const result = await collection.updateOne({ _id: "owner" }, {
           $setOnInsert: account,
@@ -50,7 +50,7 @@ export function createAdminAccounts(collection) {
         throw error;
       }
       const correctPassword = await verifyPassword(password, account.passwordHash);
-      return account.username === username && correctPassword ? { username: account.username } : null;
+      return account.username === username && correctPassword && (!account.role || account.role === "admin") ? { username: account.username } : null;
     },
   };
 }

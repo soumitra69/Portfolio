@@ -4,8 +4,9 @@ import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
 import skillIcons from "../shared/skill-icons.json" with { type: "json" };
 import { createExperienceRouter } from "./experience.js";
 import { createProfileRouter } from "./profile.js";
+import { createAdminAuth } from "../middleware/auth.js";
+import { verifyPassword, hashPassword } from "./admin-accounts.js";
 
-const SESSION_DURATION = 8 * 60 * 60 * 1000;
 const allowedSkillIcons = new Set(skillIcons.map((icon) => icon.value));
 
 function validateSkill(input) {
@@ -33,10 +34,11 @@ export function validateProject(input) {
   return { title: title.trim(), description: description.trim(), image, demoUrl, githubUrl, technologies: technologies.map((tech) => tech.trim()) };
 }
 
-export function createAdminRouter({ store, uploadDirectory, username = process.env.ADMIN_USERNAME, password = process.env.ADMIN_PASSWORD }) {
+export function createAdminRouter({ store, uploadDirectory, submissionRouter, jwtSecret, username = process.env.ADMIN_USERNAME, password = process.env.ADMIN_PASSWORD }) {
   const router = Router();
-  const sessions = new Map();
-  const cookieOptions = { httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production", path: "/api/admin" };
+  const auth = createAdminAuth({ store, secret: jwtSecret });
+  // Local JSON-mode setup can provide a hash; never persist a plaintext password.
+  const localPasswordHash = !store.authenticateAdmin && password ? hashPassword(password) : Promise.resolve(process.env.ADMIN_PASSWORD_HASH);
 
   router.use((request, response, next) => {
     response.set("Cache-Control", "no-store");
@@ -59,41 +61,29 @@ export function createAdminRouter({ store, uploadDirectory, username = process.e
           : "The admin service is unavailable. Please try again shortly." });
       }
     } else {
-      if (!username || !password) {
-        return response.status(503).json({ message: "Admin login is not configured. Set ADMIN_USERNAME and ADMIN_PASSWORD in the backend environment." });
+      const hash = await localPasswordHash;
+      if (!username || !hash) {
+        return response.status(503).json({ message: "Admin login is not configured. Connect the backend to MongoDB and create the admin account." });
       }
-      if (matches(request.body?.username, username) && matches(request.body?.password, password)) account = { username };
+      if (matches(request.body?.username, username) && await verifyPassword(request.body?.password, hash)) account = { username };
     }
     if (!account) {
       return response.status(401).json({ message: "Incorrect username or password." });
     }
-    for (const [token, session] of sessions) if (session.expiresAt < Date.now()) sessions.delete(token);
-    const token = randomBytes(32).toString("hex");
-    sessions.set(token, { username: account.username, expiresAt: Date.now() + SESSION_DURATION });
-    response.cookie("portfolio_admin", token, { ...cookieOptions, maxAge: SESSION_DURATION });
+    await auth.signIn(account.username, response);
     response.json({ username: account.username });
   });
 
-  router.use((request, response, next) => {
-    const token = request.get("Cookie")?.split(";").map((item) => item.trim()).find((item) => item.startsWith("portfolio_admin="))?.slice("portfolio_admin=".length);
-    if (!token || !sessions.has(token) || sessions.get(token).expiresAt <= Date.now()) {
-      if (token) sessions.delete(token);
-      return response.status(401).json({ message: "Please sign in to continue." });
-    }
-    request.adminToken = token;
-    request.adminUsername = sessions.get(token).username;
-    next();
-  });
+  router.use(auth.protect);
 
   router.get("/session", (request, response) => response.json({ username: request.adminUsername }));
   router.use(createExperienceRouter(store));
   router.use(createProfileRouter({ store, uploadDirectory }));
-  router.post("/logout", (request, response) => {
-    sessions.delete(request.adminToken);
-    response.clearCookie("portfolio_admin", cookieOptions);
+  if (submissionRouter) router.use(submissionRouter);
+  router.post("/logout", async (_request, response) => {
+    await auth.signOut(response);
     response.json({ message: "Signed out." });
   });
-  router.get("/messages", async (_request, response) => response.json((await store.read()).messages.toReversed()));
   router.post("/skills", async (request, response) => {
     const skill = validateSkill(request.body);
     if (!skill) return response.status(400).json({ message: "Enter a skill name of up to 60 characters and select an icon." });
@@ -120,24 +110,6 @@ export function createAdminRouter({ store, uploadDirectory, username = process.e
       return true;
     });
     response.status(deleted ? 200 : 404).json({ message: deleted ? "Skill deleted." : "Skill not found." });
-  });
-  router.patch("/messages/:id", async (request, response) => {
-    if (typeof request.body?.read !== "boolean") return response.status(400).json({ message: "Read must be a boolean." });
-    const found = await store.update((data) => {
-      const message = data.messages.find((item) => item.id === request.params.id);
-      if (message) message.read = request.body.read;
-      return message;
-    });
-    response.status(found ? 200 : 404).json(found || { message: "Message not found." });
-  });
-  router.delete("/messages/:id", async (request, response) => {
-    const found = await store.update((data) => {
-      const index = data.messages.findIndex((item) => item.id === request.params.id);
-      if (index < 0) return false;
-      data.messages.splice(index, 1);
-      return true;
-    });
-    response.status(found ? 200 : 404).json({ message: found ? "Message deleted." : "Message not found." });
   });
   router.post("/projects", async (request, response) => {
     const project = validateProject(request.body);
