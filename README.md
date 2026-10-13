@@ -70,7 +70,32 @@ ADMIN_PASSWORD=admin
 # Optional: DATA_FILE=/absolute/path/to/portfolio.json
 ```
 
-Data persists in `backend/data/portfolio.json`. Writes are serialized and saved atomically within a single process. Use persistent storage for hosting and back up this file. Use a database for multiple backend instances. Admin endpoints require an HttpOnly session cookie and custom request header, supplied by the dashboard. Login and contact submissions have rate limits.
+Without MongoDB configured, data persists in `backend/data/portfolio.json`. Writes are serialized and saved atomically within a single process. Use persistent storage for hosting and back up this file. Admin endpoints require an HttpOnly session cookie and custom request header, supplied by the dashboard. Login and contact submissions have rate limits.
+
+### MongoDB Atlas
+
+Set these server-only variables in the ignored `backend/.env` file:
+
+```dotenv
+MONGODB_URI=mongodb+srv://<database-user>:<encoded-password>@portfolio.squb9eq.mongodb.net/?appName=Portfolio
+MONGODB_DB=portfolio
+```
+
+Run `npm run check:db --workspace backend` to verify the connection, then
+`npm run dev` to start the portfolio. The backend imports existing local data
+or seed defaults into MongoDB on its first start, preserving any data already
+in the database. Projects, skills, experience, profile metadata, and contact
+messages use MongoDB; profile image files still need persistent upload storage.
+Atlas Network Access must allow the backend's IP address.
+
+MongoDB admin login uses the database's `admins` collection. To create the first
+account, set your chosen `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `backend/.env`
+and run `npm run setup:admin:db --workspace backend`. Existing accounts are preserved.
+
+For the hosted portfolio, also set `MONGODB_URI` and `MONGODB_DB` in the Render
+backend service environment and restart the service. Local `.env` settings do
+not configure Render. Never put the URI in frontend code or `NEXT_PUBLIC_*`
+variables. See [backend setup](backend/README.md) for deployment details.
 
 Supabase Storage credentials belong in the ignored `backend/.env` file:
 
