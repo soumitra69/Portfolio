@@ -5,16 +5,24 @@ import { useEffect, useRef, useState } from "react";
 export default function Header({
   navigation,
   brand = "Soumitra Samanta",
-  defaultTheme = "light",
+  defaultTheme = "dark",
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("dark");
   const [active, setActive] = useState("home");
+  const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef(null);
   const menuButton = useRef(null);
 
   useEffect(() => {
-    let savedTheme = "light";
+    const update = () => setScrolled(window.scrollY > 24);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+
+  useEffect(() => {
+    let savedTheme = "dark";
     try {
       const saved = localStorage.getItem("portfolio-theme");
       savedTheme =
@@ -77,10 +85,17 @@ export default function Header({
   }
 
   return (
-    <header ref={headerRef}>
+    <header ref={headerRef} data-scrolled={scrolled}>
       <nav aria-label="Main navigation">
         <a className="logo" href="#home" onClick={() => setMenuOpen(false)}>
-          {brand}
+          <span className="brand-symbol" aria-hidden="true">
+            {brand.trim().slice(0, 1)}
+            <span>.</span>
+          </span>
+          <span>
+            {brand}
+            <span className="brand-period">.</span>
+          </span>
         </a>
         <ul id="nav-links" className={`nav-links${menuOpen ? " active" : ""}`}>
           {(navigation || []).map((item) => (

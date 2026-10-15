@@ -8,6 +8,7 @@ import SectionAnimations from "./SectionAnimations";
 import VisitorAnalytics from "./VisitorAnalytics";
 import DepthCard from "./DepthCard";
 import { formatMonth } from "../shared/format-month";
+const HeroScene = dynamic(() => import("./HeroScene"));
 const Gallery = dynamic(() => import("./Gallery"), {
   loading: () => <p role="status">Loading gallery...</p>,
 });
@@ -15,7 +16,11 @@ const photoProps = (url) => ({
   unoptimized: url.startsWith("/api/") || url.startsWith("https://"),
 });
 
-export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
+export default function PublicPortfolio({
+  initialContent,
+  analyticsEnabled,
+  resumeUrl = "",
+}) {
   const [content, setContent] = useState(initialContent);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(!initialContent);
@@ -28,9 +33,13 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
       if (!response.ok)
         throw Error("Unable to load portfolio content. Please try again.");
       const next = await response.json();
-      if (!next.profile || !next.settings || !Array.isArray(next.sections)) throw Error("Invalid portfolio content");
-      setContent((current) => next.availability === "offline" && current && !current.isStatic
-        ? { ...current, availability: "offline" } : next);
+      if (!next.profile || !next.settings || !Array.isArray(next.sections))
+        throw Error("Invalid portfolio content");
+      setContent((current) =>
+        next.availability === "offline" && current && !current.isStatic
+          ? { ...current, availability: "offline" }
+          : next,
+      );
       setError("");
     } catch {
       setError("Unable to load portfolio content. Please try again.");
@@ -139,19 +148,24 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
   function sectionContent(key) {
     if (key === "home")
       return (
-        <div className="hero-content" data-photo-visible={!!(profile.photoUrl && profile.photoVisible)}>
+        <div className="hero-content">
           <div className="hero-text fade-in-up">
             <p className="hero-eyebrow">
               <span />
-              {profile.title}
+              DESIGN. DEVELOP. MAKE IT MATTER.
             </p>
             <h1>
-              {profile.greeting} {profile.name}
+              <span className="hero-greeting">{profile.greeting} </span>
+              <span className="hero-name">{profile.name}</span>
             </h1>
-            <p>{profile.shortIntroduction}</p>
+            <h2 className="hero-role">{profile.title}</h2>
+            <p className="hero-description">{profile.shortIntroduction}</p>
             <div className="cta-buttons">
               <a href={profile.primaryCtaUrl} className="btn btn-primary">
-                <i className="fas fa-code" aria-hidden="true" />
+                <i
+                  className="fas fa-arrow-up-right-from-square"
+                  aria-hidden="true"
+                />
                 {profile.primaryCtaText}
               </a>
               {profile.secondaryCtaText && (
@@ -160,42 +174,67 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
                   {profile.secondaryCtaText}
                 </a>
               )}
+              <a
+                href={resumeUrl || "#contact"}
+                className="btn btn-resume"
+                {...(resumeUrl
+                  ? {
+                      download: true,
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    }
+                  : {})}
+              >
+                <i
+                  className={`fas fa-${resumeUrl ? "download" : "file-lines"}`}
+                  aria-hidden="true"
+                />
+                {resumeUrl ? "Download Resume" : "Request Resume"}
+              </a>
             </div>
-            <div className="hero-socials">{socials}</div>
+            <div className="hero-socials">
+              {socials}
+              <span className="hero-social-caption">
+                Let&apos;s connect and build something.
+              </span>
+            </div>
+            <a className="scroll-cue" href="#about">
+              <span />
+              Scroll to explore
+              <i className="fas fa-arrow-down" aria-hidden="true" />
+            </a>
           </div>
-          {profile.photoUrl && profile.photoVisible && (
-            <DepthCard
-              className={`hero-image profile-stage background-${profile.backgroundVisual}`}
-              enabled={tilt}
-            >
-              <div className="profile-orbit orbit-one" aria-hidden="true" />
-              <div className="profile-orbit orbit-two" aria-hidden="true" />
-              <div className="profile-platform" aria-hidden="true" />
-              <Image
-                src={profile.photoUrl}
-                alt={profile.name}
-                className="profile-img"
-                width={350}
-                height={350}
-                sizes="(max-width: 768px) 250px, 350px"
-                preload
-                {...photoProps(profile.photoUrl)}
-              />
-              <div className="profile-caption">
-                <span className="profile-caption-icon">&lt;/&gt;</span>
+          <div className="hero-visual">
+            <HeroScene
+              enabled={settings.animationsEnabled}
+              name={profile.name}
+            />
+            {profile.photoUrl && profile.photoVisible && (
+              <div className="developer-badge">
+                <Image
+                  className="profile-img"
+                  src={profile.photoUrl}
+                  alt={profile.name}
+                  width={54}
+                  height={54}
+                  sizes="54px"
+                  {...photoProps(profile.photoUrl)}
+                />
                 <div>
                   <strong>{profile.name}</strong>
                   <span>{profile.title}</span>
                 </div>
+                <i className="fas fa-code" aria-hidden="true" />
               </div>
-            </DepthCard>
-          )}
+            )}
+          </div>
         </div>
       );
     if (key === "about")
       return (
         <div className="about-content">
-          <div className="about-text">
+          <DepthCard className="about-text glass-panel" enabled={tilt}>
+            <span className="content-kicker">THE PERSON BEHIND THE CODE</span>
             <p>{about.shortIntroduction}</p>
             <p>{about.longDescription}</p>
             {profile.longIntroduction && <p>{profile.longIntroduction}</p>}
@@ -210,6 +249,27 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
             {about.additionalInformation && (
               <p>{about.additionalInformation}</p>
             )}
+          </DepthCard>
+          <div className="about-details">
+            <DepthCard className="about-toolkit glass-panel" enabled={tilt}>
+              <i className="fas fa-cubes" aria-hidden="true" />
+              <h3>My toolkit</h3>
+              <p>The technologies behind my work.</p>
+              {tags(content.skills.map((skill) => skill.name))}
+            </DepthCard>
+            <DepthCard className="about-work glass-panel" enabled={tilt}>
+              <span className="about-project-count">
+                {String(content.projects.length).padStart(2, "0")}
+                <span>projects to explore</span>
+              </span>
+              <a href="#projects">
+                Explore my work
+                <i
+                  className="fas fa-arrow-up-right-from-square"
+                  aria-hidden="true"
+                />
+              </a>
+            </DepthCard>
           </div>
         </div>
       );
@@ -234,6 +294,9 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
                     >
                       <i className={skill.icon} aria-hidden="true" />
                       <p>{skill.name}</p>
+                      <span className="skill-caption">
+                        {skill.category || "Technology"}
+                      </span>
                       {Number.isFinite(skill.level) && (
                         <div
                           className="skill-level"
@@ -256,7 +319,7 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
     if (key === "projects")
       return content.projects.length ? (
         <div className="projects-grid">
-          {content.projects.map((project) => (
+          {content.projects.map((project, index) => (
             <DepthCard
               as="article"
               enabled={tilt}
@@ -278,6 +341,9 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
                 )}
               </div>
               <div className="project-content">
+                <span className="project-index">
+                  PROJECT / {String(index + 1).padStart(2, "0")}
+                </span>
                 {project.category && (
                   <span className="content-kicker">{project.category}</span>
                 )}
@@ -463,9 +529,13 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
                   </div>
                 ),
             )}
+            <div className="contact-socials">{socials}</div>
           </div>
           {settings.contactFormEnabled ? (
-            <ContactForm inquiryEnabled={settings.inquiryEnabled} disabled={offline} />
+            <ContactForm
+              inquiryEnabled={settings.inquiryEnabled}
+              disabled={offline}
+            />
           ) : (
             <p className="portfolio-empty">
               The contact form is currently closed.
@@ -476,18 +546,20 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
     return null;
   }
   return (
-    <div className="premium-portfolio">
+    <div className="premium-portfolio dark-portfolio">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <Header
         navigation={content.navigation}
         brand={settings.portfolioTitle}
         defaultTheme={settings.theme}
       />
-      <a className="skip-link" href="#main-content">
-        Skip to content
-      </a>
       {(error || offline) && (
         <div className="content-error" role="status">
-          {offline ? "You can browse my portfolio. Live updates and message submissions are temporarily unavailable." : "Some updates could not be loaded."}{" "}
+          {offline
+            ? "You can browse my portfolio. Live updates and message submissions are temporarily unavailable."
+            : "Some updates could not be loaded."}{" "}
           <button onClick={reload}>Try again</button>
         </div>
       )}
@@ -495,7 +567,9 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
         {sections.map((section) => (
           <section
             id={section.key}
-            data-background={section.key === "home" ? profile.backgroundVisual : undefined}
+            data-background={
+              section.key === "home" ? profile.backgroundVisual : undefined
+            }
             className={
               section.key === "home" ? "hero premium-hero" : section.key
             }
@@ -516,6 +590,7 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
                         ? contactInfo.heading
                         : section.heading}
                   </h2>
+                  <span className="section-rule" aria-hidden="true" />
                 </div>
                 {sectionContent(section.key)}
               </div>

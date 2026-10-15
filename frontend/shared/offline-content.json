@@ -253,7 +253,7 @@
   "gallery": [],
   "profile": {
     "name": "Soumitra Samanta",
-    "title": "Front-end Developer",
+    "title": "MERN Stack / Full-Stack Developer",
     "greeting": "Hi, I'm",
     "shortIntroduction": "A passionate Front-end Developer creating amazing digital experiences with modern technologies and clean code.",
     "longIntroduction": "",
@@ -293,7 +293,7 @@
     "seoDescription": "Soumitra Samanta's developer portfolio, skills, projects, and contact information.",
     "canonicalUrl": "https://soumitrasamanta69.netlify.app",
     "favicon": "",
-    "theme": "light",
+    "theme": "dark",
     "primaryColor": "#2563eb",
     "animationsEnabled": true,
     "tiltEnabled": true,

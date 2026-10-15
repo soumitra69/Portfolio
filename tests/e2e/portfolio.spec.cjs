@@ -9,10 +9,11 @@ test("existing sections, desktop links, dark theme and contact validation work",
   await expect(page.getByRole("heading", { name: "Hi, I'm Soumitra Samanta" })).toBeVisible();
   await expect(page.locator(".project-card")).toHaveCount(3);
   await expect(page.locator(".project-links a")).toHaveCount(6);
-  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.reload(); await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.reload(); await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await page.getByRole("link", { name: "Get In Touch", exact: true }).click();
   await page.getByRole("button", { name: "Send Message", exact: true }).click();
   await expect(page.getByLabel("Name", { exact: true })).toHaveAttribute("aria-invalid", "true");

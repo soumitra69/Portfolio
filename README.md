@@ -119,3 +119,26 @@ content on focus, refresh and every 30 seconds, preserving already loaded live
 content during a later outage. Once the API recovers, live CMS content and forms
 resume automatically. The static copy is not a database backup and changes to
 live CMS content still require the backend and Atlas to be available.
+
+## Dark 3D presentation
+
+The public design uses a dark default, floating translucent navigation, glass
+cards and a lazy-loaded Three.js hero. The CMS still controls content, visibility,
+section order, theme, accent color, animation and tilt settings. Saved visitor
+theme choices take precedence. The matching backend seed defaults to dark with
+the requested MERN Stack / Full-Stack Developer title; existing database records
+are preserved and can be updated through the CMS.
+
+The scene caps rendering at 24 FPS and device pixel ratio at 1.25, pauses outside
+the viewport and in hidden tabs, and disposes GPU resources on cleanup. Mobile,
+reduced-motion, low-memory, software-GPU and unsupported WebGL environments use
+the static CSS composition without downloading Three.js. A pause control is
+available when the animated scene is active. No external models or animation
+frameworks are needed. Existing photos, project links, contact/inquiry APIs,
+gallery controls, admin editing and outage behavior are retained.
+
+Set PORTFOLIO_RESUME_URL to an existing public PDF URL or /assets/resume.pdf
+after placing the real file in frontend/public/assets. This switches Request
+Resume to Download Resume. No resume document, skill levels, qualifications or
+experience have been fabricated. The request link goes to the existing Contact
+section when no resume is configured.

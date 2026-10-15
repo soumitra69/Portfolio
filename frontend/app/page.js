@@ -30,6 +30,11 @@ export default async function Home() {
     <PublicPortfolio
       initialContent={await getPortfolio()}
       analyticsEnabled={process.env.ANALYTICS_ENABLED === "true"}
+      resumeUrl={
+        /^(https?:\/\/|\/(?!\/))/.test(process.env.PORTFOLIO_RESUME_URL || "")
+          ? process.env.PORTFOLIO_RESUME_URL
+          : ""
+      }
     />
   );
 }

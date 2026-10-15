@@ -10,7 +10,7 @@ export default function SectionAnimations({ enabled = true }) {
       !window.IntersectionObserver
     )
       return;
-    const sections = document.querySelectorAll("main section");
+    const sections = document.querySelectorAll("main section, main .experience-card");
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

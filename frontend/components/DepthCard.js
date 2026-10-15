@@ -31,6 +31,8 @@ export default function DepthCard({
       if (ref.current) {
         ref.current.style.setProperty("--tilt-x", `${-y * 6}deg`);
         ref.current.style.setProperty("--tilt-y", `${x * 6}deg`);
+        ref.current.style.setProperty("--card-x", `${(x + 0.5) * 100}%`);
+        ref.current.style.setProperty("--card-y", `${(y + 0.5) * 100}%`);
       }
     });
   }

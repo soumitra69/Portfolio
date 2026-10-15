@@ -2,7 +2,9 @@
   "name": "frontend",
   "version": "1.0.0",
   "private": true,
-  "engines": { "node": ">=22.9.0" },
+  "engines": {
+    "node": ">=22.9.0"
+  },
   "scripts": {
     "dev": "node ../scripts/dev.mjs",
     "dev:web": "next dev",
@@ -10,9 +12,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "next": "^16.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@fortawesome/fontawesome-free": "^6.7.2"
+    "three": "^0.186.1"
   }
 }

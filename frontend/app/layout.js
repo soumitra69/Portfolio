@@ -1,5 +1,6 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
+import "./portfolio.css";
 import Script from "next/script";
 
 export const metadata = {
@@ -9,9 +10,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <body>
-        <Script id="portfolio-theme" strategy="beforeInteractive">{`try { document.documentElement.dataset.theme = localStorage.getItem('portfolio-theme') === 'dark' ? 'dark' : 'light'; } catch {}`}</Script>
+        <Script id="portfolio-theme" strategy="beforeInteractive">{`try { document.documentElement.dataset.theme = localStorage.getItem('portfolio-theme') === 'light' ? 'light' : 'dark'; } catch {}`}</Script>
         {children}
       </body>
     </html>
