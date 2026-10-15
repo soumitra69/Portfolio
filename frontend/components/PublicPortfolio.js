@@ -27,7 +27,10 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
       });
       if (!response.ok)
         throw Error("Unable to load portfolio content. Please try again.");
-      setContent(await response.json());
+      const next = await response.json();
+      if (!next.profile || !next.settings || !Array.isArray(next.sections)) throw Error("Invalid portfolio content");
+      setContent((current) => next.availability === "offline" && current && !current.isStatic
+        ? { ...current, availability: "offline" } : next);
       setError("");
     } catch {
       setError("Unable to load portfolio content. Please try again.");
@@ -36,7 +39,7 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
     }
   }, []);
   useEffect(() => {
-    if (!initialContent) reload();
+    if (!initialContent || initialContent.availability === "offline") reload();
     const refresh = () => {
       if (document.visibilityState === "visible") reload();
     };
@@ -101,6 +104,7 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
       </main>
     );
   const { profile, about, contactInfo, settings, sections } = content;
+  const offline = content.availability === "offline";
   const tilt = settings.animationsEnabled && settings.tiltEnabled;
   const tags = (items = []) => (
     <div className="project-tech">
@@ -461,7 +465,7 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
             )}
           </div>
           {settings.contactFormEnabled ? (
-            <ContactForm inquiryEnabled={settings.inquiryEnabled} />
+            <ContactForm inquiryEnabled={settings.inquiryEnabled} disabled={offline} />
           ) : (
             <p className="portfolio-empty">
               The contact form is currently closed.
@@ -481,9 +485,9 @@ export default function PublicPortfolio({ initialContent, analyticsEnabled }) {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      {error && (
+      {(error || offline) && (
         <div className="content-error" role="status">
-          Some updates could not be loaded.{" "}
+          {offline ? "You can browse my portfolio. Live updates and message submissions are temporarily unavailable." : "Some updates could not be loaded."}{" "}
           <button onClick={reload}>Try again</button>
         </div>
       )}

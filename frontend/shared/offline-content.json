@@ -1,0 +1,305 @@
+{
+  "navigation": [
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 0,
+      "id": "nav-home",
+      "name": "Home",
+      "link": "#home",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 10,
+      "id": "nav-about",
+      "name": "About",
+      "link": "#about",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 20,
+      "id": "nav-skills",
+      "name": "Skills",
+      "link": "#skills",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 30,
+      "id": "nav-services",
+      "name": "Services",
+      "link": "#services",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 40,
+      "id": "nav-experience",
+      "name": "Experience",
+      "link": "#experience",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 50,
+      "id": "nav-education",
+      "name": "Education",
+      "link": "#education",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 60,
+      "id": "nav-projects",
+      "name": "Projects",
+      "link": "#projects",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 70,
+      "id": "nav-gallery",
+      "name": "Gallery",
+      "link": "#gallery",
+      "icon": ""
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 80,
+      "id": "nav-contact",
+      "name": "Contact",
+      "link": "#contact",
+      "icon": ""
+    }
+  ],
+  "sections": [
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 0,
+      "id": "section-home",
+      "key": "home",
+      "heading": "Home"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 10,
+      "id": "section-about",
+      "key": "about",
+      "heading": "About Me"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 20,
+      "id": "section-skills",
+      "key": "skills",
+      "heading": "Skills"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 30,
+      "id": "section-services",
+      "key": "services",
+      "heading": "Services"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 40,
+      "id": "section-experience",
+      "key": "experience",
+      "heading": "Experience"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 50,
+      "id": "section-education",
+      "key": "education",
+      "heading": "Education"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 60,
+      "id": "section-projects",
+      "key": "projects",
+      "heading": "My Projects"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 70,
+      "id": "section-gallery",
+      "key": "gallery",
+      "heading": "Gallery"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 80,
+      "id": "section-contact",
+      "key": "contact",
+      "heading": "Get In Touch"
+    }
+  ],
+  "socialLinks": [],
+  "projects": [
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 0,
+      "id": "project-1",
+      "title": "Digital Marketing Agency Website",
+      "description": "A clean and modern landing page for a fictional digital marketing agency, built using HTML, CSS, and responsive design principles.",
+      "image": "/assets/Digital_Marketing_Agency_Website_ (1).png",
+      "technologies": [
+        "HTML5",
+        "CSS3"
+      ],
+      "demoUrl": "https://soumitra69.github.io/Digital_Marketing_Agency_Website/",
+      "githubUrl": "https://github.com/soumitra69/Digital_Marketing_Agency_Website"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 10,
+      "id": "project-2",
+      "title": "Cryptocurrency Price Tracker Website",
+      "description": "A simple, responsive cryptocurrency tracker UI built with only HTML and CSS. This project showcases a clean front-end layout for a crypto price tracker interface.",
+      "image": "/assets/soumitra69.github.io_Cryptocurrency_Price_Tracker_Website_.png",
+      "technologies": [
+        "HTML5",
+        "CSS3"
+      ],
+      "demoUrl": "https://soumitra69.github.io/Cryptocurrency_Price_Tracker_Website/",
+      "githubUrl": "https://github.com/soumitra69/Cryptocurrency_Price_Tracker_Website"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 20,
+      "id": "project-3",
+      "title": "Movie streaming download website",
+      "description": "A sleek and responsive movie streaming website UI made using HTML, CSS, and JavaScript.",
+      "image": "/assets/CineFlix-A-stylish-movie-streaming-download-website_.png",
+      "technologies": [
+        "HTML5",
+        "CSS3",
+        "JavaScript"
+      ],
+      "demoUrl": "https://soumitra69.github.io/CineFlix-A-stylish-movie-streaming-download-website/",
+      "githubUrl": "https://github.com/soumitra69/CineFlix-A-stylish-movie-streaming-download-website"
+    }
+  ],
+  "skills": [
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 0,
+      "id": "skill-html",
+      "name": "HTML",
+      "icon": "fa-brands fa-html5"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 10,
+      "id": "skill-css",
+      "name": "CSS3",
+      "icon": "fa-brands fa-css3-alt"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 20,
+      "id": "skill-javascript",
+      "name": "JavaScript",
+      "icon": "fa-brands fa-js"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 30,
+      "id": "skill-bootstrap",
+      "name": "Bootstrap",
+      "icon": "fa-brands fa-bootstrap"
+    },
+    {
+      "isActive": true,
+      "isVisible": true,
+      "displayOrder": 40,
+      "id": "skill-react",
+      "name": "React",
+      "icon": "fa-brands fa-react"
+    }
+  ],
+  "services": [],
+  "experience": [],
+  "education": [],
+  "gallery": [],
+  "profile": {
+    "name": "Soumitra Samanta",
+    "title": "Front-end Developer",
+    "greeting": "Hi, I'm",
+    "shortIntroduction": "A passionate Front-end Developer creating amazing digital experiences with modern technologies and clean code.",
+    "longIntroduction": "",
+    "information": "",
+    "photoUrl": "",
+    "photoVisible": false,
+    "primaryCtaText": "View My Work",
+    "primaryCtaUrl": "#projects",
+    "secondaryCtaText": "Get In Touch",
+    "secondaryCtaUrl": "#contact",
+    "backgroundVisual": "orbital"
+  },
+  "about": {
+    "heading": "About Me",
+    "shortIntroduction": "I'm a passionate full-stack developer with over 5 years of experience creating digital solutions that make a difference. I specialize in modern web technologies and love turning complex problems into simple, beautiful designs.",
+    "longDescription": "When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or sharing knowledge with the developer community.",
+    "highlights": [],
+    "additionalInformation": "",
+    "isVisible": true,
+    "displayOrder": 10
+  },
+  "contactInfo": {
+    "heading": "Get In Touch",
+    "ctaText": "Let's work together!",
+    "introduction": "I'm always interested in new opportunities and interesting projects. Whether you have a question or just want to say hi, feel free to reach out!",
+    "email": "",
+    "emailVisible": false,
+    "mobile": "",
+    "mobileVisible": false,
+    "location": "",
+    "locationVisible": false
+  },
+  "settings": {
+    "portfolioTitle": "Soumitra Samanta",
+    "siteDescription": "Soumitra Samanta's developer portfolio, skills, projects, and contact information.",
+    "seoTitle": "Soumitra Samanta | Portfolio",
+    "seoDescription": "Soumitra Samanta's developer portfolio, skills, projects, and contact information.",
+    "canonicalUrl": "https://soumitrasamanta69.netlify.app",
+    "favicon": "",
+    "theme": "light",
+    "primaryColor": "#2563eb",
+    "animationsEnabled": true,
+    "tiltEnabled": true,
+    "contactFormEnabled": true,
+    "inquiryEnabled": true,
+    "footerText": "My Original Portfolio",
+    "footerUrl": "https://soumitrasamanta.netlify.app/"
+  }
+}

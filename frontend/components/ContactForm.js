@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function ContactForm({ inquiryEnabled = true }) {
+export default function ContactForm({ inquiryEnabled = true, disabled = false }) {
   const [status, setStatus] = useState({ state: "idle", message: "" });
   const [mode, setMode] = useState("contact");
   const [errors, setErrors] = useState({});
@@ -29,6 +29,7 @@ export default function ContactForm({ inquiryEnabled = true }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (disabled) return;
     if (status.state === "sending") return;
     const form = event.currentTarget;
     const payload = Object.fromEntries(new FormData(form));
@@ -100,7 +101,7 @@ export default function ContactForm({ inquiryEnabled = true }) {
     >
       <fieldset
         className="contact-purpose"
-        disabled={status.state === "sending"}
+        disabled={disabled || status.state === "sending"}
       >
         <legend>What would you like to discuss?</legend>
         <div className="contact-mode-options">
@@ -136,7 +137,7 @@ export default function ContactForm({ inquiryEnabled = true }) {
       </div>
       <fieldset
         className="contact-fields"
-        disabled={status.state === "sending"}
+        disabled={disabled || status.state === "sending"}
       >
         <div className="form-group">
           <label htmlFor="name">Name</label>
@@ -267,7 +268,7 @@ export default function ContactForm({ inquiryEnabled = true }) {
       <button
         type="submit"
         className="btn btn-primary"
-        disabled={status.state === "sending"}
+        disabled={disabled || status.state === "sending"}
       >
         <i
           aria-hidden="true"
@@ -280,8 +281,9 @@ export default function ContactForm({ inquiryEnabled = true }) {
             : "Send Project Inquiry"}
       </button>
       <p className="form-help">
-        Your details are used only to respond to your{" "}
+        {disabled ? "Message submissions are temporarily unavailable. Please try again later." : <>Your details are used only to respond to your{" "}
         {mode === "contact" ? "message" : "project inquiry"}.
+        </>}
       </p>
       <p
         className={`form-status ${status.state}`}

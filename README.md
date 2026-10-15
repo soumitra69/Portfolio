@@ -104,3 +104,18 @@ The Next.js server adapter is required for server rendering and the /api proxy. 
     netlify.toml           # Frontend deployment
 
 Environment files, node_modules, build outputs, test artifacts and logs are ignored. No backend folder belongs in this repository. Backend history and runtime data are maintained in the separate repository. Normal portfolio content edits require no frontend source changes.
+
+## Backend outage behavior
+
+The public page and its read-only /api/content handler use the same server-side
+loader. If the backend is unavailable or returns incompatible content, the page
+still renders the existing design and original projects from
+frontend/shared/offline-content.json. This static presentation copy includes no
+database records, contact details, social links or profile photo. It preserves
+the section order, branding, project links and responsive layout. An outage
+notice explains the limitation; submissions are disabled and admin APIs stay
+protected. No failed submission is reported as saved. The frontend retries live
+content on focus, refresh and every 30 seconds, preserving already loaded live
+content during a later outage. Once the API recovers, live CMS content and forms
+resume automatically. The static copy is not a database backup and changes to
+live CMS content still require the backend and Atlas to be available.
