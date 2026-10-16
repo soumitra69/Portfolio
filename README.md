@@ -142,3 +142,30 @@ after placing the real file in frontend/public/assets. This switches Request
 Resume to Download Resume. No resume document, skill levels, qualifications or
 experience have been fabricated. The request link goes to the existing Contact
 section when no resume is configured.
+
+## SEO and public copy
+
+See [SEO-REPORT.md](./SEO-REPORT.md) for implemented changes, checks and the exact
+Search Console verification/submission steps. Production canonical URLs and the
+single-page sitemap use `SITE_URL` in `frontend/shared/seo-content.mjs`.
+
+The shared public-content projection upgrades only the original generic starter
+text. Custom CMS titles, descriptions, profile/About/contact copy, record
+visibility and section ordering remain supported. It does not change stored
+backend records or claim unverified experience. The service guide and local
+service-area copy live in `seo-content.mjs` and `ServiceOverview.js`; the CMS
+Services section controls their visibility. Existing editable CMS service cards
+are rendered alongside the editorial guide and keep their own controls.
+
+Original image URLs remain available for existing CMS records. The public
+presentation maps known originals to smaller, descriptive WebP assets using
+`frontend/shared/image-assets.json`. After replacing an original image, regenerate:
+
+    node scripts/optimize-images.mjs
+    node scripts/create-seo-assets.mjs
+    npm run test:content
+    npm run test:seo
+
+Optional `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` environment values
+must be the real public tokens supplied by your webmaster account. No account is
+verified or sitemap submitted automatically. Rebuild/redeploy after setting them.

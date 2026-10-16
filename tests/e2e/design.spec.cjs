@@ -21,7 +21,7 @@ test("dark desktop design preserves content and supports 3D pause, tilt, links a
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator(".hero-role")).toHaveText(
-    "MERN Stack / Full-Stack Developer",
+    "Web Developer in Purba Medinipur, Haldia & Tamluk",
   );
   await expect(page.locator(".skill-item")).toHaveCount(5);
   await expect(page.locator(".hero-socials a")).toHaveCount(2);
@@ -182,7 +182,7 @@ test("an unavailable WebGL context preserves the hero, content and controls with
   );
   await expect(page.locator(".scene-fallback")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Hi, I'm Soumitra Samanta" }),
+    page.locator(".hero-identity"),
   ).toBeVisible();
   await expect(page.locator(".project-card")).toHaveCount(3);
 });

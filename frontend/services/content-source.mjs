@@ -1,5 +1,6 @@
 import offlineContent from "../shared/offline-content.json" with { type: "json" };
 import { getBackendURL } from "./backend-url.mjs";
+import { preparePublicContent } from "../shared/seo-content.mjs";
 
 export async function readPublicContent({ fetcher = fetch, env = process.env } = {}) {
   const base = getBackendURL(env);
@@ -11,8 +12,8 @@ export async function readPublicContent({ fetcher = fetch, env = process.env } =
     const content = await response.json();
     if (!content.profile || !content.settings || !content.about || !content.contactInfo ||
       !["sections", "navigation", "projects", "skills", "services", "experience", "education", "gallery", "socialLinks"].every((key) => Array.isArray(content[key]))) throw new Error("Incompatible public content");
-    return { ...content, availability: "live", isStatic: false };
+    return preparePublicContent({ ...content, availability: "live", isStatic: false });
   } catch {
-    return { ...structuredClone(offlineContent), availability: "offline", isStatic: true };
+    return preparePublicContent({ ...structuredClone(offlineContent), availability: "offline", isStatic: true });
   }
 }

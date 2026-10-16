@@ -11,7 +11,7 @@ test("a backend outage keeps SSR and mobile portfolio usable, blocks submissions
     expect(await html.text()).toContain("Digital Marketing Agency Website");
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Hi, I'm Soumitra Samanta" })).toBeVisible();
+    await expect(page.locator(".hero-identity")).toBeVisible();
     await expect(page.locator("main section")).toHaveCount(9);
     await expect(page.locator(".project-card")).toHaveCount(3);
     await expect(page.getByRole("heading", { name: "Portfolio temporarily unavailable" })).toHaveCount(0);

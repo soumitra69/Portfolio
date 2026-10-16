@@ -8,12 +8,12 @@ import SectionAnimations from "./SectionAnimations";
 import VisitorAnalytics from "./VisitorAnalytics";
 import DepthCard from "./DepthCard";
 import { formatMonth } from "../shared/format-month";
+import { HOME_HEADING } from "../shared/seo-content.mjs";
+import { imageProps } from "../shared/image-assets.mjs";
+import ServiceOverview from "./ServiceOverview";
 const HeroScene = dynamic(() => import("./HeroScene"));
 const Gallery = dynamic(() => import("./Gallery"), {
   loading: () => <p role="status">Loading gallery...</p>,
-});
-const photoProps = (url) => ({
-  unoptimized: url.startsWith("/api/") || url.startsWith("https://"),
 });
 
 export default function PublicPortfolio({
@@ -152,13 +152,13 @@ export default function PublicPortfolio({
           <div className="hero-text fade-in-up">
             <p className="hero-eyebrow">
               <span />
-              DESIGN. DEVELOP. MAKE IT MATTER.
+              {profile.title}
             </p>
-            <h1>
+            <p className="hero-identity">
               <span className="hero-greeting">{profile.greeting} </span>
               <span className="hero-name">{profile.name}</span>
-            </h1>
-            <h2 className="hero-role">{profile.title}</h2>
+            </p>
+            <h1 className="hero-role">{HOME_HEADING}</h1>
             <p className="hero-description">{profile.shortIntroduction}</p>
             <div className="cta-buttons">
               <a href={profile.primaryCtaUrl} className="btn btn-primary">
@@ -213,12 +213,10 @@ export default function PublicPortfolio({
               <div className="developer-badge">
                 <Image
                   className="profile-img"
-                  src={profile.photoUrl}
-                  alt={profile.name}
-                  width={54}
-                  height={54}
+                  alt={`${profile.name}, frontend web developer`}
+                  loading="eager"
                   sizes="54px"
-                  {...photoProps(profile.photoUrl)}
+                  {...imageProps(profile.photoUrl, 54, 54)}
                 />
                 <div>
                   <strong>{profile.name}</strong>
@@ -328,13 +326,11 @@ export default function PublicPortfolio({
             >
               <div className="project-visual">
                 <Image
-                  src={project.image}
-                  alt={`${project.title} preview`}
-                  width={1200}
-                  height={675}
+                  alt={`${project.title} — website interface preview`}
+                  loading="lazy"
                   className="project-image"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  {...photoProps(project.image)}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                  {...imageProps(project.image, 1200, 675)}
                 />
                 {project.featured && (
                   <span className="featured-label">Featured</span>
@@ -360,7 +356,7 @@ export default function PublicPortfolio({
                       className="fas fa-arrow-up-right-from-square"
                       aria-hidden="true"
                     />
-                    Live Demo
+                    View {project.title} project
                   </a>
                   <a
                     href={project.githubUrl}
@@ -368,7 +364,7 @@ export default function PublicPortfolio({
                     rel="noopener noreferrer"
                   >
                     <i className="fab fa-github" aria-hidden="true" />
-                    GitHub
+                    {project.title} source code
                   </a>
                 </div>
               </div>
@@ -379,7 +375,9 @@ export default function PublicPortfolio({
         empty("No projects have been added yet.", "fas fa-layer-group")
       );
     if (key === "services")
-      return content.services.length ? (
+      return <>
+        <ServiceOverview />
+        {content.services.length > 0 && (
         <div className="services-grid">
           {content.services.map((service) => (
             <DepthCard
@@ -391,11 +389,10 @@ export default function PublicPortfolio({
               <i className={service.icon || "fas fa-code"} aria-hidden="true" />
               {service.image && (
                 <Image
-                  src={service.image}
-                  width={700}
-                  height={400}
                   alt={service.title}
-                  {...photoProps(service.image)}
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                  {...imageProps(service.image, 700, 400)}
                 />
               )}
               <h3>{service.title}</h3>
@@ -429,9 +426,8 @@ export default function PublicPortfolio({
             </DepthCard>
           ))}
         </div>
-      ) : (
-        empty("Services will appear here when added.", "fas fa-laptop-code")
-      );
+      )}
+      </>;
     if (key === "experience")
       return content.experience.length ? (
         <div className="experience-list">

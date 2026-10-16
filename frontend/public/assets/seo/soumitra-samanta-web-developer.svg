@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="background" x2="1" y2="1"><stop stop-color="#0d1222"/><stop offset="1" stop-color="#202344"/></linearGradient>
+    <linearGradient id="accent"><stop stop-color="#a696f7"/><stop offset="1" stop-color="#e3c180"/></linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <circle cx="1090" cy="110" r="285" fill="none" stroke="#a696f7" stroke-opacity=".18"/>
+  <circle cx="1090" cy="110" r="225" fill="none" stroke="#a696f7" stroke-opacity=".12"/>
+  <rect x="72" y="70" width="58" height="5" rx="2" fill="url(#accent)"/>
+  <g font-family="Arial, sans-serif">
+    <text x="72" y="132" fill="#d7c18b" font-size="20" letter-spacing="3">DESIGN · DEVELOPMENT · RESPONSIVE WEB</text>
+    <text x="68" y="260" fill="#f4f5fc" font-size="82" font-weight="700">Soumitra Samanta</text>
+    <text x="72" y="328" fill="#c6bcf4" font-size="33">Web Developer &amp; Frontend Developer</text>
+    <text x="72" y="415" fill="#d2d6e3" font-size="25">Modern, responsive websites with React.</text>
+    <text x="72" y="458" fill="#aab4c9" font-size="23">Purba Medinipur · Haldia · Tamluk · Digha · West Bengal</text>
+    <line x1="72" y1="510" x2="1128" y2="510" stroke="#ffffff" stroke-opacity=".14"/>
+    <text x="72" y="563" fill="#e3c180" font-size="21">soumitrasamanta69.netlify.app</text>
+    <text x="1040" y="563" fill="#a696f7" font-size="35" font-weight="700">&lt;/&gt;</text>
+  </g>
+</svg>

@@ -1,40 +1,25 @@
 import PublicPortfolio from "../components/PublicPortfolio";
 import { getPortfolio } from "../services/portfolio";
+import { buildHomeMetadata, buildStructuredData, serializeStructuredData } from "../shared/seo-content.mjs";
 
 export async function generateMetadata() {
-  const content = await getPortfolio();
-  if (!content)
-    return { title: "Portfolio", description: "Developer portfolio" };
-  const { settings, profile } = content;
-  return {
-    title: settings.seoTitle,
-    description: settings.seoDescription,
-    ...(settings.canonicalUrl
-      ? {
-          metadataBase: new URL(settings.canonicalUrl),
-          alternates: { canonical: settings.canonicalUrl },
-        }
-      : {}),
-    openGraph: {
-      title: settings.seoTitle,
-      description: settings.seoDescription,
-      type: "website",
-      ...(settings.canonicalUrl ? { url: settings.canonicalUrl } : {}),
-      ...(profile.photoUrl ? { images: [profile.photoUrl] } : {}),
-    },
-    ...(settings.favicon ? { icons: { icon: settings.favicon } } : {}),
-  };
+  return buildHomeMetadata(await getPortfolio());
 }
 export default async function Home() {
+  const content = await getPortfolio();
   return (
-    <PublicPortfolio
-      initialContent={await getPortfolio()}
-      analyticsEnabled={process.env.ANALYTICS_ENABLED === "true"}
-      resumeUrl={
-        /^(https?:\/\/|\/(?!\/))/.test(process.env.PORTFOLIO_RESUME_URL || "")
-          ? process.env.PORTFOLIO_RESUME_URL
-          : ""
-      }
-    />
+    <>
+      <script id="portfolio-structured-data" type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeStructuredData(buildStructuredData(content)) }} />
+      <PublicPortfolio
+        initialContent={content}
+        analyticsEnabled={process.env.ANALYTICS_ENABLED === "true"}
+        resumeUrl={
+          /^(https?:\/\/|\/(?!\/))/.test(process.env.PORTFOLIO_RESUME_URL || "")
+            ? process.env.PORTFOLIO_RESUME_URL
+            : ""
+        }
+      />
+    </>
   );
 }

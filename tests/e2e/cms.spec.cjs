@@ -123,7 +123,8 @@ test("admin editors publish, hide, restore, reorder and delete real CMS content"
   await expect(
     publicPage.getByText("soumitrasamanta69@gmail.com", { exact: true }),
   ).toHaveCount(0);
-  await expect(publicPage.getByText("Haldia", { exact: true })).toHaveCount(0);
+  // Contact privacy is separate from the explicitly public service-area copy.
+  await expect(publicPage.locator("#contact .contact-item").getByText("Haldia", { exact: true })).toHaveCount(0);
   await page.getByLabel("Show mobile", { exact: true }).check();
   await page.getByLabel("Show email", { exact: true }).check();
   await page.getByLabel("Show location", { exact: true }).check();

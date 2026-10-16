@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import defaultProfile from "../shared/profile.json";
+import { imageProps } from "../shared/image-assets.mjs";
 
 export default function ProfilePhoto() {
   const [photoUrl, setPhotoUrl] = useState(defaultProfile.photoUrl);
@@ -14,7 +15,7 @@ export default function ProfilePhoto() {
     return () => controller.abort();
   }, []);
 
-  return <Image src={photoUrl} alt="Soumitra Samanta" className="profile-img" width={350} height={350}
+  return <Image {...imageProps(photoUrl, 350, 350)} alt="Soumitra Samanta, frontend web developer" className="profile-img"
     preload sizes="(max-width: 480px) 200px, (max-width: 768px) 250px, 350px"
-    unoptimized={photoUrl.startsWith("/api/media/")} onError={() => setPhotoUrl(defaultProfile.photoUrl)} />;
+    onError={() => setPhotoUrl(defaultProfile.photoUrl)} />;
 }

@@ -6,7 +6,7 @@ test("existing sections, desktop links, dark theme and contact validation work",
   await page.goto("/");
   await expect(page.locator("main section")).toHaveCount(9);
   expect(await page.locator("main section").evaluateAll((sections) => sections.map((section) => section.id))).toEqual(["home", "about", "skills", "services", "experience", "education", "projects", "gallery", "contact"]);
-  await expect(page.getByRole("heading", { name: "Hi, I'm Soumitra Samanta" })).toBeVisible();
+  await expect(page.locator(".hero-identity")).toBeVisible();
   await expect(page.locator(".project-card")).toHaveCount(3);
   await expect(page.locator(".project-links a")).toHaveCount(6);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

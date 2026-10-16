@@ -173,7 +173,7 @@ html[data-theme="dark"] {
   width: 5px;
   height: 5px;
 }
-.dark-portfolio .hero-text h1 {
+.dark-portfolio .hero-text .hero-identity {
   background: none;
   -webkit-text-fill-color: initial;
   color: var(--text-primary);
@@ -209,6 +209,17 @@ html[data-theme="dark"] {
   letter-spacing: -0.02em;
   color: var(--text-primary);
   margin-bottom: 1.2rem;
+}
+.dark-portfolio .hero-text h1.hero-role {
+  font-size: clamp(0.95rem, 1.35vw, 1.16rem);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  margin: 0 0 1.2rem;
+  max-width: 42ch;
 }
 .dark-portfolio .hero-text .hero-description {
   max-width: 45ch;
@@ -922,6 +933,19 @@ html[data-theme="dark"] {
   color: var(--text-secondary);
   font-size: 0.85rem;
 }
+
+/* SEO editorial content uses the established cards, colors and type scale. */
+.services-introduction { max-width: 75ch; margin-bottom: 2rem; color: var(--text-secondary); }
+.services-introduction a, .service-approach > a { color: var(--text-primary); text-decoration: underline; text-underline-offset: 4px; }
+.service-guide { margin-bottom: 2rem; }
+.service-areas { padding: clamp(1.5rem, 4vw, 2.5rem); margin-block: 3rem 2rem; }
+.service-areas h3, .service-approach h3 { font-size: clamp(1.2rem, 2.2vw, 1.65rem); line-height: 1.4; margin-bottom: 1rem; }
+.service-areas p, .service-approach p { max-width: 80ch; color: var(--text-secondary); margin-bottom: 1.25rem; }
+.service-area-list { display: flex; flex-wrap: wrap; gap: .6rem; list-style: none; padding: 0; margin-block: 1.5rem; }
+.service-area-list li { border: 1px solid var(--border-color); border-radius: 999px; padding: .4rem .8rem; font-size: .8rem; color: var(--text-secondary); }
+.service-approach { margin-block: 2rem 3rem; }
+.not-found-page { min-height: 80vh; padding: 3rem 1.5rem; gap: 1.5rem; max-width: 52rem; margin-inline: auto; }
+.not-found-page a { color: var(--text-primary); }
 .dark-portfolio .gallery-card {
   border-color: var(--border-color);
   border-radius: 15px;

@@ -21,6 +21,7 @@ export default function HeroScene({
       setSupported(
         enabled &&
           media.matches &&
+          !navigator.connection?.saveData &&
           !(navigator.deviceMemory && navigator.deviceMemory < 4),
       );
     update();

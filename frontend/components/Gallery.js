@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { imageProps } from "../shared/image-assets.mjs";
 
 export default function Gallery({ items }) {
   const [category, setCategory] = useState("All");
@@ -74,15 +75,10 @@ export default function Gallery({ items }) {
             aria-label={`Open ${item.title}`}
           >
             <Image
-              src={item.image}
-              width={700}
-              height={700}
               alt={item.title}
+              loading="lazy"
               sizes="(max-width: 768px) 100vw, 33vw"
-              unoptimized={
-                item.image.startsWith("/api/") ||
-                item.image.startsWith("https://")
-              }
+              {...imageProps(item.image, 700, 700)}
             />
             {item.featured && <span className="featured-label">Featured</span>}
             <span>
@@ -141,7 +137,7 @@ export default function Gallery({ items }) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View related link
+                  View {current.title} related project
                 </a>
               )}
             </div>

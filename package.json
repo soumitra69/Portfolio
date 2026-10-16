@@ -12,6 +12,7 @@
     "test": "npm run test:e2e",
     "test:e2e": "playwright test",
     "test:content": "node --test tests/unit/content-source.test.mjs",
+    "test:seo": "node --test tests/unit/seo.test.mjs",
     "check:api": "node scripts/check-api.mjs"
   },
   "engines": {
